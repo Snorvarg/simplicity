@@ -52,6 +52,7 @@ Router::scope('/', function ($routes) {
      * ...and connect the rest of 'EditablePages' controller's URLs.
      */
     $routes->connect('/pages/*', ['controller' => 'EditablePages', 'action' => 'display']);
+    $routes->connect('/pages/edit/*', ['controller' => 'EditablePages', 'action' => 'edit']);
 
     /**
      * Connect catchall routes for all controllers.
