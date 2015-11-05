@@ -2,6 +2,8 @@
 /* Edit form for EditablePages.
  * 
  */
+
+echo $this->TinyMCE->GetScript();
 ?>
 
 <h1><?= __("Edit Page") ?></h1>

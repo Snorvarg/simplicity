@@ -1,9 +1,6 @@
 <?php
 
 use App\Controller\EditablePagesController;
-/* 
- * 
- */
 
 //debug($element->identifier);
 ?>
@@ -24,6 +21,24 @@ use App\Controller\EditablePagesController;
 
 	if(EditablePagesController::UserCanEditPages())
 	{
-		echo $this->Html->link(__('Edit page'), array('action' => 'edit', $element->id));
+		echo $this->Html->link(
+				__('Edit page'), 
+				[
+						'action' => 'edit', 
+						$element->id],
+				[
+						'class' => 'button',
+						'style' => 'margin-right: 10px;'
+				]);
+		echo $this->Form->postLink(
+				__('Erase page'), 
+				[
+						'action' => 'delete', 
+						$element->id],
+				[
+						'class' => 'button',
+						'type' => 'post',
+						'confirm' => __('Are you sure?')
+				]);
 	}
 ?>

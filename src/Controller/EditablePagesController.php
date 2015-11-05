@@ -156,6 +156,32 @@ class EditablePagesController extends AppController
 			
 			$this->set('element', $element);
 		}
+
+		public function delete($id = null)
+		{
+			if(EditablePagesController::UserCanEditPages() == false)
+			{
+				$this->Flash->error(__('You do not have permission to delete this page.'));
+				return $this->redirect('/');
+			}
+			
+			// Make sure only post and delete are allowed. Trying to load this page normally will yield an exception.
+			// It is a safety-precaution as web crawlers could accidentally delete all content while exploring all links.
+			$this->request->allowMethod(['post', 'delete']);
+			
+			$richTextElements = TableRegistry::get('RichTextElements');
+				
+			$element = $richTextElements->get($id);
+						
+			if($richTextElements->delete($element))
+			{
+				$this->Flash->success(__('The page was deleted.'));
+				return $this->redirect('/');
+			}
+			
+			$this->Flash->error(__('The page could not be deleted.'));
+			return $this->redirect('/');
+		}
 		
 		public static function UserCanEditPages()
 		{
