@@ -25,20 +25,26 @@ use App\Controller\EditablePagesController;
 				__('Edit page'), 
 				[
 						'action' => 'edit', 
-						$element->id],
+						$element->id,
+						'?' => ['korvar' => '42']
+				],
 				[
 						'class' => 'button',
-						'style' => 'margin-right: 10px;'
+						'style' => 'margin-right: 10px;',
+						'?' => ['korvar' => '12']
 				]);
 		echo $this->Form->postLink(
 				__('Erase page'), 
 				[
 						'action' => 'delete', 
-						$element->id],
+						$element->id,
+						'?' => ['korvar' => '12'],
+				],
 				[
 						'class' => 'button',
 						'type' => 'post',
-						'confirm' => __('Are you sure?')
+						'confirm' => __('Are you sure?'),
+						'?' => ['korvar' => '42'],
 				]);
 	}
 ?>
