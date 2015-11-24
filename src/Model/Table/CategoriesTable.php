@@ -3,7 +3,6 @@
 namespace App\Model\Table;
 
 use Cake\ORM\Table;
-use Cake\ORM\RulesChecker;
 
 class CategoriesTable extends Table
 {
@@ -14,9 +13,32 @@ class CategoriesTable extends Table
 		$this->addBehavior('Tree');
 	}
 
+	/* Returns the category with the given name, and the given parent.
+	 * If it does not exist,  null is returned. 
+	 * 
+	 */
 	public function GetCategoryByParentName($parentName, $name)
 	{
-		// TODO: Här ska du använda Tree, som letar upp alla $name med parent $parentName.
+		// First find all parents with the given name.
+		$possibleParentsQuery = $this->find('all')->where(['name' => $parentName]);
+		$possibleParents = $possibleParentsQuery->all(); 
+ 		// debug($possibleParents);
+		
+		// Then find the child. 
+		foreach($possibleParents as $parent)
+		{
+			$descendants = $this->find('children', ['for' => $parent->id])->where(['name' => $name])->all();
+			// debug($descendants);
+			
+			// Since we know there can only be one combination of parent-child with the given names, stop at first finding.
+			if(count($descendants) > 0)
+			{
+				return $descendants->first();
+			}
+		}
+		
+		// Not found.
+		return null;
 	}
 	
 	/* Returns the category with the given name and parent_id. 
@@ -78,44 +100,44 @@ class CategoriesTable extends Table
 		return $element;
 	}
 	
-	// TODO: Använder Tree, som är en icke-rekursiv funktion för att skapa en trädstruktur i databasen. 
-	// 		Den kan med en enda query ta fram alla children för vilken del av trädet som helst. 
+	// TODO: AnvÃ¤nder Tree, som Ã¤r en icke-rekursiv funktion fÃ¶r att skapa en trÃ¤dstruktur i databasen. 
+	// 		Den kan med en enda query ta fram alla children fÃ¶r vilken del av trÃ¤det som helst. 
 	//    Med en annan query kan man lika enkelt ta fram 'path to a node', tex. red-roses ger plants/roses/red-roses.
-	//    Medelst en enkel liten loop kan man visuellt återskapa ett träd. 
-	// En källa: 
+	//    Medelst en enkel liten loop kan man visuellt Ã¥terskapa ett trÃ¤d. 
+	// En kÃ¤lla: 
 	// http://www.sitepoint.com/hierarchical-data-database-2/
 	// TreeBehaviour docs: 
 	// http://book.cakephp.org/3.0/en/orm/behaviors/tree.html
 	
-	// Kolla in 'Node Level' och se om du behöver använda det. (fält i databasen)
-	// Kolla in 'Scoping and Multi Trees' och språk. Det kanske är lika bra att använda Tree även för språk?
-	//  ..måste du inte det? Du flyttar ju ut 'flowers' delen ur 'flowers/roses', så endast 'roses' (och parent_id!!) 
-	//    blir kvar som identifier för RichTextElement. 
-	//    Så, du måste även flytta ut språket? 
-	//   <-Spontant skulle jag vilja lägga språket , i18n, som ett rotelement, och sen låta alla kategorier hamna där under. 
-	//		 Men då försvinner förmågan att ha samma identifier men olika språk, det blir helt omöjligt att ha bra 
-	//		 multispråkstöd. 
-	//     Om jag behåller språktaggen i18n i RichTextElement, så kan samtliga språkversioner av 
-	//     RödaRosor, RedRoses, RosasRojos, osv. ha samma parent_id. 
-	//     Då blir det bajseligt lätt att se på vilka språk en sida finns: 
+	// Kolla in 'Node Level' och se om du behÃ¶ver anvÃ¤nda det. (fÃ¤lt i databasen)
+	// Kolla in 'Scoping and Multi Trees' och sprÃ¥k. Det kanske Ã¤r lika bra att anvÃ¤nda Tree Ã¤ven fÃ¶r sprÃ¥k?
+	//  ..mÃ¥ste du inte det? Du flyttar ju ut 'flowers' delen ur 'flowers/roses', sÃ¥ endast 'roses' (och parent_id!!) 
+	//    blir kvar som identifier fÃ¶r RichTextElement. 
+	//    SÃ¥, du mÃ¥ste Ã¤ven flytta ut sprÃ¥ket? 
+	//   <-Spontant skulle jag vilja lÃ¤gga sprÃ¥ket , i18n, som ett rotelement, och sen lÃ¥ta alla kategorier hamna dÃ¤r under. 
+	//		 Men dÃ¥ fÃ¶rsvinner fÃ¶rmÃ¥gan att ha samma identifier men olika sprÃ¥k, det blir helt omÃ¶jligt att ha bra 
+	//		 multisprÃ¥kstÃ¶d. 
+	//     Om jag behÃ¥ller sprÃ¥ktaggen i18n i RichTextElement, sÃ¥ kan samtliga sprÃ¥kversioner av 
+	//     RÃ¶daRosor, RedRoses, RosasRojos, osv. ha samma parent_id. 
+	//     DÃ¥ blir det bajseligt lÃ¤tt att se pÃ¥ vilka sprÃ¥k en sida finns: 
 	//      Ta fram alla med samma identifier och category_id. 
-	//		  OBS: Hela detta tänket förutsätter att det är ok att en url är flowers/roses/the_red_french_rose,
-	//      på alla språk. 
-	//       Det finns alltså tre språkversioner av RichTextElement med identifier "the_red_french_rose", och 
-	//       parent_id pekar på Category "roses". En kategory är således språklös. 
-	//    ..en användare är fortfarande fri att skapa kategorier på olika språk, och ange identifier på varje språk,
-	//    men dels förlorar han möjligheten att se om sidan finns på alla språk, dels tror jag att det är dumt att
-	//    ens försöka få in franska i en url, och både Category och RichTextElement.identifier är en del av urlen. 
-	//    ..så min rekommendation för alla som vill använda mitt system är att ha samma url till samma sida, på
-	//    samtliga språk. 
-	// DONE: Det är alltså RIKTIGT HÖG TID att få språket på plats! Följande alternativ finnes: 
+	//		  OBS: Hela detta tÃ¤nket fÃ¶rutsÃ¤tter att det Ã¤r ok att en url Ã¤r flowers/roses/the_red_french_rose,
+	//      pÃ¥ alla sprÃ¥k. 
+	//       Det finns alltsÃ¥ tre sprÃ¥kversioner av RichTextElement med identifier "the_red_french_rose", och 
+	//       parent_id pekar pÃ¥ Category "roses". En kategory Ã¤r sÃ¥ledes sprÃ¥klÃ¶s. 
+	//    ..en anvÃ¤ndare Ã¤r fortfarande fri att skapa kategorier pÃ¥ olika sprÃ¥k, och ange identifier pÃ¥ varje sprÃ¥k,
+	//    men dels fÃ¶rlorar han mÃ¶jligheten att se om sidan finns pÃ¥ alla sprÃ¥k, dels tror jag att det Ã¤r dumt att
+	//    ens fÃ¶rsÃ¶ka fÃ¥ in franska i en url, och bÃ¥de Category och RichTextElement.identifier Ã¤r en del av urlen. 
+	//    ..sÃ¥ min rekommendation fÃ¶r alla som vill anvÃ¤nda mitt system Ã¤r att ha samma url till samma sida, pÃ¥
+	//    samtliga sprÃ¥k. 
+	// DONE: Det Ã¤r alltsÃ¥ RIKTIGT HÃ–G TID att fÃ¥ sprÃ¥ket pÃ¥ plats! FÃ¶ljande alternativ finnes: 
 	//  -DETTA: urlen. Det kan ligga som en url-parameter: flowers/roses/red_roses?lang=en-EN
 	//  -cookie. "en-EN" ligger i en cookie. 
-	//  -session. "en-EN" ligger i en sessionvariabel på servern. 
-	// <-urlen tillåter att man länkar till specifik sida, så det är det jag tänker använda mig av!! 
-	//   Det finns ett sätt till, att mha. routing ta ut språkvalet ur urlen i början, men jag ser ingen större nackdel
-	//   med att ha en url-param. (se.flowers.com är en subdomänlösning jag gillar, men det kräver av användaren 
-	//   av simplicity att konfigurera upp det på sin server: krångel, alla kan inte.)
+	//  -session. "en-EN" ligger i en sessionvariabel pÃ¥ servern. 
+	// <-urlen tillÃ¥ter att man lÃ¤nkar till specifik sida, sÃ¥ det Ã¤r det jag tÃ¤nker anvÃ¤nda mig av!! 
+	//   Det finns ett sÃ¤tt till, att mha. routing ta ut sprÃ¥kvalet ur urlen i bÃ¶rjan, men jag ser ingen stÃ¶rre nackdel
+	//   med att ha en url-param. (se.flowers.com Ã¤r en subdomÃ¤nlÃ¶sning jag gillar, men det krÃ¤ver av anvÃ¤ndaren 
+	//   av simplicity att konfigurera upp det pÃ¥ sin server: krÃ¥ngel, alla kan inte.)
 	
 	
 	
@@ -130,7 +152,7 @@ class CategoriesTable extends Table
  `created` DATETIME NULL,
  `modified` DATETIME NULL,
  PRIMARY KEY (`id`),
- UNIQUE KEY `uk_parent_id_name` (`parent_id`, `name`)
+ UNIQUE KEY `uk_parent_id_name` (`parent_id`, `name`) 
  )
  COLLATE='utf8_unicode_ci'
  ENGINE=InnoDB

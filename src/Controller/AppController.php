@@ -69,6 +69,13 @@ class AppController extends Controller
         $category = $categories->GetCategoryByParentId(null, 'smultron');
         $category = $categories->GetCategoryByParentId(null, 'getter');
         $category = $categories->GetCategoryByParentId(1, 'getter');
+        $category = $categories->GetCategoryByParentId(1, "får");
+        $category = $categories->GetCategoryByParentId(1, "far");  // Samma i unicode-ci :)
+        $category = $categories->GetCategoryByParentId(1, "smultron");
+        
+//         debug($category);
+        
+        $category = $categories->GetCategoryByParentName('smultron', 'getter');
         debug($category);
         
         // TESTING END

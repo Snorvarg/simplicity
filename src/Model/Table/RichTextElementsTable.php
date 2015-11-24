@@ -45,18 +45,18 @@ class RichTextElementsTable extends Table
 	 */
 	public function GetCategories($i18n = null)
 	{
-		// TODO: Detta är brutalt osmidigt. Att söka i strängar i databasen kommer att kräva en total genomsökning av samtliga
-		// element utan möjlighet för db att optimera. 
-		// ...du måste bryta ut category ur urlen. 
+		// TODO: Detta Ã¤r brutalt osmidigt. Att sÃ¶ka i strÃ¤ngar i databasen kommer att krÃ¤va en total genomsÃ¶kning av samtliga
+		// element utan mÃ¶jlighet fÃ¶r db att optimera. 
+		// ...du mÃ¥ste bryta ut category ur urlen. 
 		
-		// Men om nåt träsk vill ha flowers/red/roses då? 
-		// ...ska jag bryta ut samtliga categories då, och låta en category ha en parent? 
-		//  <-Då kan jag lätt använda det inbyggda tjofräset i cake, det är perfekt för det. 
-		//    och då ska ett rich_text_element ha en parent också, som leder direkt till sin innersta category, 
-		//    tex. så ska roses då ha parent red, och red (som är en kategori) har parent flowers. 
-		//    flowers parent är null.
-		//  <-Det är alltså lika bra att göra det fullt ut, och strunta i att sätta en övre gräns i rekursiviteten, 
-		//    helt upp till mongot att begränsa sig själv. 
+		// Men om nÃ¥t trÃ¤sk vill ha flowers/red/roses dÃ¥? 
+		// ...ska jag bryta ut samtliga categories dÃ¥, och lÃ¥ta en category ha en parent? 
+		//  <-DÃ¥ kan jag lÃ¤tt anvÃ¤nda det inbyggda tjofrÃ¤set i cake, det Ã¤r perfekt fÃ¶r det. 
+		//    och dÃ¥ ska ett rich_text_element ha en parent ocksÃ¥, som leder direkt till sin innersta category, 
+		//    tex. sÃ¥ ska roses dÃ¥ ha parent red, och red (som Ã¤r en kategori) har parent flowers. 
+		//    flowers parent Ã¤r null.
+		//  <-Det Ã¤r alltsÃ¥ lika bra att gÃ¶ra det fullt ut, och strunta i att sÃ¤tta en Ã¶vre grÃ¤ns i rekursiviteten, 
+		//    helt upp till mongot att begrÃ¤nsa sig sjÃ¤lv. 
 	}
 	
 	
@@ -93,16 +93,16 @@ class RichTextElementsTable extends Table
 	 *  	..
 	 *  )
 	 *  
-	 *  TODO: En funktion som trädar ner "flowers/tulipan" i flowers => tulipan
-	 *    för enkel meny-ifiering. 
-	 *  TODO: När innehållet blir stort, så bör man välja ut ett språk och en kategori i taget .
+	 *  TODO: En funktion som trÃ¤dar ner "flowers/tulipan" i flowers => tulipan
+	 *    fÃ¶r enkel meny-ifiering. 
+	 *  TODO: NÃ¤r innehÃ¥llet blir stort, sÃ¥ bÃ¶r man vÃ¤lja ut ett sprÃ¥k och en kategori i taget .
 	 *  TODO: En funktion som ger antalet kategorier i databasen. 
-	 *  TODO: En dokumentation med exempel som beskriver hur två arbetssätt: 
-	 *  	1. Man anger en url på det språk sidan är på, och får leva med att det blir svårt att se om motsvarande sida
-	 *       finns på de andra språken.
-	 *       (Men var tydlig med att menyerna funkar lika bra ändå)
-	 *    2. Man ser till att urlen (identifier) är densamma på samtliga språk, och får därmed fördelen att enkelt kunna
-	 *    	 se vilka fler språk sidan finns på.
+	 *  TODO: En dokumentation med exempel som beskriver hur tvÃ¥ arbetssÃ¤tt: 
+	 *  	1. Man anger en url pÃ¥ det sprÃ¥k sidan Ã¤r pÃ¥, och fÃ¥r leva med att det blir svÃ¥rt att se om motsvarande sida
+	 *       finns pÃ¥ de andra sprÃ¥ken.
+	 *       (Men var tydlig med att menyerna funkar lika bra Ã¤ndÃ¥)
+	 *    2. Man ser till att urlen (identifier) Ã¤r densamma pÃ¥ samtliga sprÃ¥k, och fÃ¥r dÃ¤rmed fÃ¶rdelen att enkelt kunna
+	 *    	 se vilka fler sprÃ¥k sidan finns pÃ¥.
 	 */
 	public function GetTree($i18n = null, $category = null)
 	{
