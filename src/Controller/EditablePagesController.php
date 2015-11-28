@@ -28,50 +28,62 @@ class EditablePagesController extends AppController
     public function display()
     {
 			$path = func_get_args();
-			// debug($path);
-
+			//debug($path);
+			
 			$count = count($path);
 			if(!$count) 
 			{
 				// Missing a path to use as identifier, just redirect home.
 				return $this->redirect('/');
 			}
-			$page = $subpage = null;
-			$identifier = '';
 			
-			if(!empty($path[0])) 
-			{
-				$page = $path[0];
-				$identifier = $page;
-			}
-			if(!empty($path[1])) 
-			{
-				$subpage = $path[1];
-				
-				if($identifier != '')
-				{
-					$identifier .= '/'.$subpage;
-				}
-				else 
-				{
-					$identifier .= $subpage;
-				}
-			}
-			$this->set(compact('page', 'subpage'));
+			// The last element in path is always the page, all others are categories.
+			$categoryNames = $path;
+			$pageName = array_pop($categoryNames);			
+			
+			//debug($categoryNames);
+			//debug($pageName);
+			//debug(AppController::$selectedLanguage);
 
-			$language = "en-GB";
+			$language = AppController::$selectedLanguage;
 			
 			$createIfNotExist = false;
 			if(EditablePagesController::UserCanEditPages())
 			{
 				$createIfNotExist = true;
 			}
-			
+
+			// If there are more parts of the url, lets make a category-tree out of it. 
+			if(count($categoryNames) > 0)
+			{
+				$categories = TableRegistry::get('Categories');
+				//debug($categories);
+				
+				// Get the path, or null if it does not exist and is not allowed to create it. 
+	 			$lastCategory = $categories->GetPath($categoryNames, true, $createIfNotExist);
+	 			// debug($lastCategory);
+				
+	 			if($lastCategory == null)
+	 			{
+	 				// The path does not exist, redirect home.
+	 				$this->Flash->error(__('Path does not exist.'));
+	 				return $this->redirect('/');
+	 			}
+	 			
+	 			$categoryId = $lastCategory->id;
+			}
+			else 
+			{
+				// This page is a root page, it has no parent category.
+				$categoryId = null;
+			}
+ 			
 			// Load the content of the current page.
 			$richTextElements = TableRegistry::get('RichTextElements');
-
- 			$element = $richTextElements->GetElement($identifier, $language, $createIfNotExist);
- 			// debug($element);
+				
+ 			$element = $richTextElements->GetElement(
+ 					$pageName, $categoryId, $language, $createIfNotExist);
+ 			//debug($element);
  			
  			if($element == null)
  			{
@@ -80,7 +92,7 @@ class EditablePagesController extends AppController
  				return $this->redirect('/');
  			}
  			
- 			$this->set('element', $element);
+ 			$this->set(compact('categoryNames', 'pageName', 'language', 'element'));
 
 			// Tries to render specific .ctp file. If it does not exist, fall back to the default .ctp file.
 			// Using DS as we will check for a file's existence on the server.
@@ -118,8 +130,8 @@ class EditablePagesController extends AppController
 			
 			if ($this->request->is(['post', 'put'])) 
 			{
-				// debug($this->request->data);
-				// debug($element);
+				//debug($this->request->data);
+				//debug($element);
 				
 				// Copy values into the element while also validating the fields.
 				$richTextElements->patchEntity($element, $this->request->data);
@@ -134,19 +146,13 @@ class EditablePagesController extends AppController
 				{
 					$this->Flash->success(__('Your page has been updated.'));
 					
-					$vals = explode('/', $element->identifier);
+					// Get path for the page.
+					$categories = TableRegistry::get('Categories');
+					$path = $categories->PathFor($element->category_id);
+					$path .= $element->name;
+					// debug($path);
 					
-					if(count($vals) == 2)
-					{
-						// This is just to make it look nice in the url; if the identifier is "bread/cheese" we want the
-						// url to become "display/bread/cheese" and not "display/bread%2Fost".
-						// 
-						return $this->redirect(['action' => 'display', $vals[0], $vals[1]]);
-					}
-					else
-					{
-						return $this->redirect(['action' => 'display', $element->identifier]);
-					}
+					return $this->redirect($path);
 				}
 				else
 				{

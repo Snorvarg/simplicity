@@ -16,8 +16,8 @@ use App\Controller\EditablePagesController;
 </div>
 
 <?php
-	// TODO: Nu ska RichTextElementsHelper komma till nytta, för den ska ha en funktion
-	// för att rendera en edit-knapp. Resten sköter ju vyn om, renderingen etc.
+	// TODO: Nu ska RichTextElementsHelper komma till nytta, fÃ¶r den ska ha en funktion
+	// fÃ¶r att rendera en edit-knapp. Resten skÃ¶ter ju vyn om, renderingen etc.
 
 	if(EditablePagesController::UserCanEditPages())
 	{
@@ -30,21 +30,20 @@ use App\Controller\EditablePagesController;
 				],
 				[
 						'class' => 'button',
-						'style' => 'margin-right: 10px;',
-						'?' => ['korvar' => '12']
+						'style' => 'margin-right: 10px;'
 				]);
+		
+		// A postlink does not seem to be able to have "?lang=smurfiska".
 		echo $this->Form->postLink(
 				__('Erase page'), 
 				[
 						'action' => 'delete', 
 						$element->id,
-						'?' => ['korvar' => '12'],
 				],
 				[
 						'class' => 'button',
 						'type' => 'post',
-						'confirm' => __('Are you sure?'),
-						'?' => ['korvar' => '42'],
+						'confirm' => __('Are you sure?')
 				]);
 	}
 ?>

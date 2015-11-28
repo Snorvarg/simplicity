@@ -59,25 +59,13 @@ class AppController extends Controller
         // TESTING
         $richTextElements = TableRegistry::get('RichTextElements');
         
-        $list = $richTextElements->GetTree('en-GB', 'flowers');
         $languages = $richTextElements->GetLanguageCodes();
         
         $languagesForHome = $richTextElements->GetLanguagesFor('home');
+        // debug($languagesForHome);
         
         $categories = TableRegistry::get('Categories');
-        
-        $category = $categories->GetCategoryByParentId(null, 'smultron');
-        $category = $categories->GetCategoryByParentId(null, 'getter');
-        $category = $categories->GetCategoryByParentId(1, 'getter');
-        $category = $categories->GetCategoryByParentId(1, "får");
-        $category = $categories->GetCategoryByParentId(1, "far");  // Samma i unicode-ci :)
-        $category = $categories->GetCategoryByParentId(1, "smultron");
-        
-//         debug($category);
-        
-        $category = $categories->GetCategoryByParentName('smultron', 'getter');
-        debug($category);
-        
+                                
         // TESTING END
     }
 
@@ -94,5 +82,26 @@ class AppController extends Controller
         ) {
             $this->set('_serialize', true);
         }
+    }
+    
+    /* Adds the current language url parameter on any redirect.
+     * 
+     */
+    public function redirect($url, $status = 302)
+    {
+    	if(!is_array($url))
+    	{
+    		if(strpos($url,'?lang=') === false)
+    		{
+    			$url .= '?lang='.AppController::$selectedLanguage;
+    		}
+    	}
+    	else if(!isset($url['?'])) 
+    	{
+    		// TODO: Not tested.
+    		$url['?'] = '?lang='.AppController::$selectedLanguage;
+    	}
+    	
+    	return parent::redirect($url, $status);
     }
 }

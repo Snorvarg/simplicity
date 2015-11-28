@@ -49,10 +49,24 @@ Router::scope('/', function ($routes) {
     $routes->connect('/', ['controller' => 'EditablePages', 'action' => 'display', 'home']);
 
     /**
+     * The /pages/edit is reserved for editing pages.
+     */
+    $routes->connect('/pages/edit/*', ['controller' => 'EditablePages', 'action' => 'edit']);
+
+    /**
+     * ..the /pages/delete is reserved for deleting pages.
+     */
+    $routes->connect('/pages/delete/*', ['controller' => 'EditablePages', 'action' => 'delete']);
+    
+    /**
+     * ..and connect all other pages to the 'EditablePages' controller. 
+     */
+    $routes->connect('/*', ['controller' => 'EditablePages', 'action' => 'display']);
+    
+    /**
      * ...and connect the rest of 'EditablePages' controller's URLs.
      */
-    $routes->connect('/pages/*', ['controller' => 'EditablePages', 'action' => 'display']);
-    $routes->connect('/pages/edit/*', ['controller' => 'EditablePages', 'action' => 'edit']);
+    // $routes->connect('/pages/*', ['controller' => 'EditablePages', 'action' => 'display']);
 
     /**
      * Connect catchall routes for all controllers.
