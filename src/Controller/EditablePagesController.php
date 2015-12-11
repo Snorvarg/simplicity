@@ -42,11 +42,7 @@ class EditablePagesController extends AppController
 				// Missing a path to use as identifier, just redirect home.
 				return $this->redirect('/');
 			}
-			
-			// TEST: Det funkar bra att få ut trädet så länge parent inte är null. Du måste fixa null med.
-			$tree = $this->Menu->GetTree(1, 3);
-// 			debug($tree);
-			
+						
 			// The last element in path is always the page, all others are categories.
 			$categoryNames = $path;
 			$pageName = array_pop($categoryNames);			
@@ -81,11 +77,13 @@ class EditablePagesController extends AppController
 	 			}
 	 			
 	 			$categoryId = $lastCategory->id;
+	 			$level = $lastCategory->level + 1;
 			}
 			else 
 			{
 				// This page is a root page, it has no parent category.
 				$categoryId = null;
+				$level = 1;
 			}
  			
 			// Load the content of the current page.
@@ -101,6 +99,15 @@ class EditablePagesController extends AppController
  				$this->Flash->error(__('Page does not exist.'));
  				return $this->redirect('/');
  			}
+ 			
+ 			// Get the menu tree with the root elements and their immediate children.
+//  			$tree = $this->Menu->GetTree($categoryId, $level);
+ 			$tree = $this->Menu->GetTree(null, 20);
+ 			// 			debug($tree);
+ 			
+ 			$homeTree = $this->Menu->GetTree(null, 1);
+ 			
+ 			// TODO: Jag behöver en bread-crumb array med alla categories som länkar.  			
  			
  			$this->set(compact('categoryNames', 'pageName', 'language', 'element', 'tree'));
 

@@ -43,7 +43,13 @@ class MenuHelper extends Helper
 		
 		if($repository == 'Categories')
 		{
-			$html .= $element->name;
+// TODO: Det kan ju finnas varianter på denna funktion: (och GetMenu() så klart) 
+//  En som lägger in ett 'kryss' framför, så man kan stänga en kategori som har barn i sig.
+//  En som funkar som denna gör nu. (Denna är bra för att bygga css för en left-to-right meny högst opp på sidan)
+// OBS: Kryss-grejen måste du så klart kolla upp om det inte finns en härlig js/css plugin som du kan använda. 
+//   <-Vägra bygga saker som redan finns. 
+
+			$html .= $this->Html->link($element->name.' - '.$element->level, $element->path.$element->name);
 			
 			$html .= '<ul class="'.$ulClass.' child level_'.($level + 1).'">';
 			$first = 'first';

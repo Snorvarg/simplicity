@@ -95,34 +95,47 @@ class CategoriesTable extends Table
 			// debug($this->moveUp($rootElement, 3));
 			
 			// This is a bit experimental, but the idea is to limit the selection of children to those whose level is in bounds.
-			$tree = $this->find('children', ['for' => $categoryId])
-				->where([
+			$tree = $this->find('children', ['for' => $categoryId])->
+				where([
 						'level <=' => $level + $deep,
-				])
+				])->
 				// Get only the fields we want incorporates id and parent_id for 'threaded' to work. 
-		    ->find('threaded', ['fields' => ['name','parent_id','id','level']]);
-		    //->toArray();
-			// debug($query);
+		    find('threaded', ['fields' => ['name','parent_id','id','level']])->
+				toArray();
 		}
 		else 
 		{
-			// TODO: Make it work with root elements. 
+			// The Tree behaviour don't seem to support getting 'children' where parent_id is null.  
+			$rootElements = $this->find()->
+				where([
+						'parent_id is' => null,
+						'level <=' => $deep,
+				])->
+				find('all', ['fields' => ['name','parent_id','id','level']])->
+				toArray();
+				
 			$tree = array();
+			foreach($rootElements as &$rootElement)
+			{
+				// debug($rootElement);
+				
+				if($deep > 1)
+				{
+					$subTree = $this->GetTree($rootElement->id, $deep - 1);
+					// debug($subTree);
+					
+					$rootElement->children = $subTree;
+				}
+				else 
+				{
+					$rootElement->children = array();
+				}
+				
+				$tree[] = $rootElement;
+			}
 		}
 		
 		return $tree;
-		
-// 		if($categoryId != null)
-// 		{
-// 			$children = $this->find('children', ['for' => $categoryId])->all();
-// 		}
-// 		else 
-// 		{
-// 			$children = $this->find()->where(['parent_id is' => null])->all();
-// 		}
-// 		// debug($children);
-		
-// 		return $children;
 	}
 	
 	/* Returns the given path as an array of category elements, the first element being the root element,

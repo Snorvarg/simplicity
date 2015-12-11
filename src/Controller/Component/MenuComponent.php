@@ -53,7 +53,7 @@ class MenuComponent extends Component
 	 */
 	public function GetTree($parentCategoryId = null, $level = 0)
 	{
-		$tree = $this->categories->GetTree($parentCategoryId, $level)->toArray();
+		$tree = $this->categories->GetTree($parentCategoryId, $level);
 
 		// The main difference between all() and toArray() is that all() uses 'lazy loading' while toArray() uses 'eager loading'.
 		// We need the result from all() realized into an array right now, so use toArray().
@@ -61,20 +61,35 @@ class MenuComponent extends Component
 		// 
 		//$array = array_merge($children->toArray(), $rtes->toArray());
 
+		$names = array();
+		
 		// Get the RichTextElements whose parents level is one less than the given $level.
 		foreach($tree as &$category)
 		{
-			$this->_MergeContent($category, $level);
+			$names[] = $category->name;
+			$this->_MergeContent($category, $level - 1);
 		}
+		// debug($names);
 		
-		// At last get the RTEs for the root node.
+		// Get the RTEs for the root node.
 		$rtes = $this->richTextElements->ElementsForCategory($parentCategoryId, AppController::$selectedLanguage, true);
 		$rtes = $rtes->toArray();
 		
-		foreach($rtes as $rte)
+		// Remove RTEs with same name as an existing category.
+		foreach($rtes as $id => &$rte)
 		{
-			$this->_AddPath($rte);
+			if(in_array($rte->name, $names))
+			{
+				unset($rtes[$id]);
+			}
 		}
+		unset($rte);
+		
+		foreach($rtes as &$rte)
+		{
+			$rte->path = $this->_GetPath($rte->category_id);
+		}
+		unset($rte);
 		
 		$tree = array_merge($tree, $rtes);
 		
@@ -113,8 +128,12 @@ class MenuComponent extends Component
 	 */
 	protected function _MergeContent(&$category, $level)
 	{
+		$category->path = $this->_GetPath($category->parent_id);
+		
+		$names = array();
 		foreach($category->children as &$child)
 		{
+			$names[] = $child->name;
 			$this->_MergeContent($child, $level);
 		}
 	
@@ -122,25 +141,32 @@ class MenuComponent extends Component
 		{
 			$rtes = $this->richTextElements->ElementsForCategory($category->id, AppController::$selectedLanguage, true);
 			$rtes = $rtes->toArray();
-			// 			debug($category->id);
-			// 			debug($rtes);
 	
-			foreach($rtes as $rte)
+			// Remove RTEs with same name as an existing category.
+			foreach($rtes as $id => &$rte)
 			{
-				$this->_AddPath($rte);
-			}			
+				if(in_array($rte->name, $names))
+				{
+					unset($rtes[$id]);
+				}
+			}
+			unset($rte);
+				
+			foreach($rtes as &$rte)
+			{
+				$rte->path = $this->_GetPath($rte->category_id);
+			}
+			unset($rte);
 			
 			$category->children = array_merge($category->children, $rtes);
 		}
 	}
 	
-	/* Add the url path to the given richTextElement as variable 'path'.
+	/* Get the url path for the given category_id.
 	 *
 	 */
-	protected function _AddPath(&$richTextElement)
+	protected function _GetPath($category_id)
 	{
-		debug($richTextElement);
-		$richTextElement->path = $this->categories->PathFor($richTextElement->category_id);
-		debug($richTextElement->path);
+		return $this->categories->PathFor($category_id);
 	}	
 }
