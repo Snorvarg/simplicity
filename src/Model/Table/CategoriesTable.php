@@ -226,7 +226,7 @@ class CategoriesTable extends Table
 		{
 			$path .= $crumb->name."/"; 
 		}
-		
+				
 		return $path;
 	}
 

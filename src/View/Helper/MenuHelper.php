@@ -10,6 +10,32 @@ class MenuHelper extends Helper
 
 	public $helpers = ['Html'];
 	
+	/* Render the html for the bread crumb url path.
+	 *  
+	 */
+	public function GetBreadCrumb($path, $richTextElement, $ulClass = 'simplicity breadcrumbs', $liClass = 'crumb')
+	{
+		$html = '';
+		
+		$html .= '<ul class="'.$ulClass.'">';
+		
+		for($i=0; $i<count($path); $i++)
+		{
+			$element = &$path[$i];
+			
+			$html .= '<li class="'.$liClass.'">';
+			$html .= $this->Html->link($element->name, $element->path);
+			$html .= '</li>';
+		}
+		
+		$html .= '<li class="'.$liClass.' current">';
+		$html .= $this->Html->link($richTextElement->name, $richTextElement->path.$richTextElement->name);
+		$html .= '</li>';
+		$html .= '</ul>';
+		
+		return $html;
+	}
+	
 	/* Render the html for the given menu tree. 
 	 * 
 	 */

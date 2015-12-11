@@ -19,6 +19,32 @@ class MenuComponent extends Component
 		$this->richTextElements = TableRegistry::get('RichTextElements');
 	}
 	
+	/* Returns the path for the given rte as an url-path, like 'trolls/eat/' for the page named 'snails'.
+	 * 
+	 */
+	public function SetPathFor(&$richTextElement)
+	{
+		$richTextElement->path = $this->categories->PathFor($richTextElement->category_id);
+	}
+	
+	/* Returns the given path as an array of category elements, or null if not the entire path exists.
+	 * 
+	 */
+	public function GetPath($categoryNames)
+	{
+		$elements = $this->categories->GetPath($categoryNames, false, false);
+		
+		if($elements == null)
+			return null;
+		
+		foreach($elements as &$element)
+		{
+			$element->path = $this->_GetPath($element->id);
+		}
+		
+		return $elements;
+	}
+	
 	/* Returns the children of the given category, including RichTextElements. If null is given, the root-nodes are returned. 
 	 * If level is greater than 0, it is branched down 'level' childrens down. 
 	 * 
@@ -141,7 +167,7 @@ class MenuComponent extends Component
 		{
 			$rtes = $this->richTextElements->ElementsForCategory($category->id, AppController::$selectedLanguage, true);
 			$rtes = $rtes->toArray();
-	
+				
 			// Remove RTEs with same name as an existing category.
 			foreach($rtes as $id => &$rte)
 			{

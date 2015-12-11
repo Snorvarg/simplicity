@@ -53,6 +53,8 @@ class EditablePagesController extends AppController
 
 			$language = AppController::$selectedLanguage;
 			
+			$categories = TableRegistry::get('Categories');
+			
 			$createIfNotExist = false;
 			if(EditablePagesController::UserCanEditPages())
 			{
@@ -62,9 +64,6 @@ class EditablePagesController extends AppController
 			// If there are more parts of the url, lets make a category-tree out of it. 
 			if(count($categoryNames) > 0)
 			{
-				$categories = TableRegistry::get('Categories');
-				//debug($categories);
-				
 				// Get the path, or null if it does not exist and is not allowed to create it. 
 	 			$lastCategory = $categories->GetPath($categoryNames, true, $createIfNotExist);
 	 			// debug($lastCategory);
@@ -76,13 +75,15 @@ class EditablePagesController extends AppController
 	 				return $this->redirect('/');
 	 			}
 	 			
-	 			$categoryId = $lastCategory->parent_id;
-	 			$level = 3;
+	 			$categoryId = $lastCategory->id;
+	 			$parentCategoryId = $lastCategory->parent_id;
+	 			$level = $lastCategory->level + 3;
 			}
 			else 
 			{
 				// This page is a root page, it has no parent category.
 				$categoryId = null;
+				$parentCategoryId = null;
 				$level = 2;
 			}
  			
@@ -91,7 +92,7 @@ class EditablePagesController extends AppController
 				
  			$element = $richTextElements->GetElement(
  					$pageName, $categoryId, $language, $createIfNotExist);
- 			//debug($element);
+ 			// debug($element);
  			
  			if($element == null)
  			{
@@ -100,16 +101,21 @@ class EditablePagesController extends AppController
  				return $this->redirect('/');
  			}
  			
+ 			// Set the path so the Menu helper can use it to create the breadcrumb path correctly.
+ 			$this->Menu->SetPathFor($element);
+ 			// debug($element->path);
+ 			
+ 			$breadcrumbPath = $this->Menu->GetPath($categoryNames);
+ 			// debug($breadcrumbPath);
+ 			
  			// Get the menu tree with the root elements and their immediate children.
-  		$tree = $this->Menu->GetTree($categoryId, $level);
-//  			$tree = $this->Menu->GetTree(null, 20);
+  		$tree = $this->Menu->GetTree($parentCategoryId, $level);
+  		//	$tree = $this->Menu->GetTree(null, 20);
  			// 			debug($tree);
  			
- 			$homeTree = $this->Menu->GetTree(null, 1);
+ 			$homeTree = $this->Menu->GetTree(null, 1); 			
  			
- 			// TODO: Jag behöver en bread-crumb array med alla categories som länkar.  			
- 			
- 			$this->set(compact('categoryNames', 'pageName', 'language', 'element', 'tree', 'homeTree'));
+ 			$this->set(compact('categoryNames', 'pageName', 'language', 'element', 'breadcrumbPath', 'tree', 'homeTree'));
 
 			// Tries to render specific .ctp file. If it does not exist, fall back to the default .ctp file.
 			// Using DS as we will check for a file's existence on the server.

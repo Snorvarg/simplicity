@@ -10,6 +10,8 @@ use App\Controller\EditablePagesController;
 <h3>Context menu</h3>
 <?= $this->Menu->GetMenu($tree); ?>
 
+<?= $this->Menu->GetBreadCrumb($breadcrumbPath, $element); ?>
+
 <div>
 	<?= $element->content ?>
 </div>
