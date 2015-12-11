@@ -37,6 +37,11 @@ class SimplicityHtmlHelper extends HtmlHelper
 				$url['?']['lang'] = AppController::$selectedLanguage;
 			}
 		}
+		else 
+		{
+			$url .= '?lang='.AppController::$selectedLanguage;
+		}
+// 		debug($url);
 		
 		return parent::link($title,$url,$options);
 	}

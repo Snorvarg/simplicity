@@ -3,6 +3,8 @@
 use App\Controller\EditablePagesController;
 
 //debug($element->identifier);
+
+	echo $this->Menu->GetMenu($tree);
 ?>
 
 <div>
@@ -39,6 +41,7 @@ use App\Controller\EditablePagesController;
 				[
 						'action' => 'delete', 
 						$element->id,
+						'?' => ['franken' => 'stein']
 				],
 				[
 						'class' => 'button',

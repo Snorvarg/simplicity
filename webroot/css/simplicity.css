@@ -1,0 +1,20 @@
+/**
+ * simplicity.css
+ *
+ * 
+ */
+ 
+ul.simplicity.root{
+	color: red;
+	font-weight: bold;
+}
+ul.simplicity{
+	color: black;
+	background-color: white;
+}
+li.simplicity.first{
+	color: brown;
+}
+li.simplicity{
+	color: orange;
+}

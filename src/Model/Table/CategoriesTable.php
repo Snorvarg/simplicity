@@ -3,6 +3,10 @@
 namespace App\Model\Table;
 
 use Cake\ORM\Table;
+use RuntimeException;
+
+// TODO: All queries, more or less, fetch all rows from table, while in some cases only a fraction is needed. 
+//   Update, and check the cake debug kits sql query tab.
 
 /****
  * A Category is a part of the url, like the 'flowers' in the url mysite.now/flowers/the_rose?lang=EN-en
@@ -26,9 +30,101 @@ class CategoriesTable extends Table
 	public function initialize(array $config)
 	{
 		$this->addBehavior('Timestamp');
-		$this->addBehavior('Tree');
+		
+		// We want the level, or deep, saved along with the category. 
+		$this->addBehavior('Tree', ['level' => 'level']);
 	}
-
+	
+	/**
+	 * Returns the immediate childrens of the given category, or all root-categories if null is given. 
+	 * 
+	 * This can be used to fetch the immediate sub-menu-items for the currently active menu.
+	 * 
+	 * TODO: Dels trädstrukturen som de har 'färdig' för Tree, med länkar, 
+	 * dels en Helper (eller Component?) som producerar en meny för den nivån som är aktiv. 
+	 * 
+	 * 1. Denna Helper/Component ska ha en MainMenu() som helt enkelt tar alla rot-element. 
+	 * 2. Den ska också ha SubMenu($categoryId) som kort o gott anropar GetChildren() nedan. 
+	 * 3. CrossLevelMenu($level) skapar en meny med categories med den angivna leveln. 
+	 * 		<-Här är det viktigt att jag tänker ut ett praktiskt exempel, jag kommer inte på något nu dock.. :)
+	 * <-Det stora arbetet denna Helper/Component har är att den också ska ta ut alla sidor. (RichTextElements)
+	 *   En meny ska självklart grena ner till enskilda sidor. 
+	 *   
+	 *  EX: Om jag visar sidan belse/bubbels/sprayflaska, så vill jag i menyn se alla sidor och kategorier under
+	 *      belse/bubbels/. Detta är vad som kallas en submeny. 
+	 *  EX: Huvudmenyn är fortfarande alla sidor och kategorier utan förälder.
+	 *  
+	 *  OBS: Den stora frågan kvarstår: Helper/Component? Det får nog bli både och, och så får jag läsa på lite om 
+	 *  		 AppController::preRender() eller vad det nu kan heta, där detta arbetet ska göras. (Kan i princip göras
+	 *  		 i EditablePagesController::display() med..)
+	 *  			<-Nä, användaren vill nog ha friheten att ha andra controllers ändå, som enkelt kan få menyn etc. via en
+	 *  			  Component. En Helper kan sedan ta resultatet från Componenten och rendera. 
+	 *  				Givetvis gör EditablePagesController::display() allt detta i ett ordnat kaos.
+	 *  			<-Alltså, display() anropar komponenten o får ett gäng meny-variabler. Vyn default.ctp använder sedan
+	 *  				Helpern för att rendera menyn. Då kan vilken controller som helst använda sig av meny-systemet. 
+	 */
+	public function GetTree($categoryId = null, $deep = 1)
+	{
+		if($deep < 1)
+			throw new RuntimeException("Parameter deep cannot be less than one.");
+		
+		if($categoryId != null)
+		{
+			$rootElement = $this->find()->where(['id' => $categoryId])->first();
+// 			debug($rootElement);
+			
+			$level = $rootElement->level;
+// 			debug($level + $deep);
+			
+			// This nicely give me an array with children down to the level specified.
+			// path, children, treeList <-are the 'implementedFinders' for TreeBehaviour.
+/*			$query = $this->find('treeList', [
+					'keyPath' => 'id',
+					'valuePath' => 'name',
+					'spacer' => ' '
+			])
+			->where([
+					'level <=' => $level + $deep, 
+					'parent_id >=' => $categoryId
+			])
+			->toArray();
+*/
+			
+			// This is not working as I expect it to; I assume the element to climb up 3 steps in the tree-structure,
+			// but nothing at all happens.
+			// debug($this->moveUp($rootElement, 3));
+			
+			// This is a bit experimental, but the idea is to limit the selection of children to those whose level is in bounds.
+			$tree = $this->find('children', ['for' => $categoryId])
+				->where([
+						'level <=' => $level + $deep,
+				])
+				// Get only the fields we want incorporates id and parent_id for 'threaded' to work. 
+		    ->find('threaded', ['fields' => ['name','parent_id','id','level']]);
+		    //->toArray();
+			// debug($query);
+		}
+		else 
+		{
+			// TODO: Make it work with root elements. 
+			$tree = array();
+		}
+		
+		return $tree;
+		
+// 		if($categoryId != null)
+// 		{
+// 			$children = $this->find('children', ['for' => $categoryId])->all();
+// 		}
+// 		else 
+// 		{
+// 			$children = $this->find()->where(['parent_id is' => null])->all();
+// 		}
+// 		// debug($children);
+		
+// 		return $children;
+	}
+	
 	/* Returns the given path as an array of category elements, the first element being the root element,
 	 * and the last element being the innermost child element.  
 	 * 
@@ -120,35 +216,13 @@ class CategoriesTable extends Table
 		
 		return $path;
 	}
-	
-// NOT USED: Rätt onödig väl
-	/* Returns the category with the given name and parent_id. 
-	 * If it does not already exist, it is created, if $createIfNotExist is true.
-	 * 
-	 */
-	public function GetCategoryByParentId($parent_id, $name, $createIfNotExist = true)
-	{
-		if($name == '')
-			return null;
-		
-		$element = $this->FindCategory($parent_id, $name);
-				
-    if($element == null && $createIfNotExist)
-    {
-      // The category does not exist yet, let's create it.
-      $element = $this->_CreateCategory($parent_id, $name);
-    }
-    
-    // debug($element);
-    
-    return $element;
-	}
+
 
 	/* Tries to find the given category by its name and category.
 	 * Returns null if not found.
 	 * 
 	 */
-	protected function FindCategory($parent_id, $name)
+	protected function _FindCategory($parent_id, $name)
 	{
 		if($parent_id == null)
 		{
@@ -187,7 +261,7 @@ class CategoriesTable extends Table
 		}
 		 
 		// Once created, lets read it back in.
-		$element = $this->FindCategory($parent_id, $name);
+		$element = $this->_FindCategory($parent_id, $name);
 		
 		return $element;
 	}
@@ -202,11 +276,9 @@ class CategoriesTable extends Table
 	// TreeBehaviour docs: 
 	// http://book.cakephp.org/3.0/en/orm/behaviors/tree.html
 	
-	// Kolla in 'Node Level' och se om du behöver använda det. (fält i databasen)
-	//     Om jag behåller språktaggen i18n i RichTextElement, så kan samtliga språkversioner av 
-	//     RödaRosor, RedRoses, RosasRojos, osv. ha samma parent_id. 
-	//     Då blir det bajseligt lätt att se på vilka språk en sida finns: 
-	//      Ta fram alla med samma identifier och category_id. 
+	//     Språktaggen i18n i RichTextElement medger att jag kan ha samtliga språkversioner av 
+	//     RödaRosor, RedRoses, RosasRojos, osv. med samma parent_id. 
+	//     Då blir det bajseligt lätt att se på vilka språk en sida finns: GetLanguagesFor($name)
 	//		  OBS: Hela detta tänket förutsätter att det är ok att en url är flowers/roses/the_red_french_rose,
 	//      på alla språk. 
 	//       Det finns alltså tre språkversioner av RichTextElement med identifier "the_red_french_rose", och 
@@ -224,6 +296,7 @@ class CategoriesTable extends Table
  `parent_id` INT(10) NULL,
  `lft` INT(10) NOT NULL,
  `rght` INT(10) NOT NULL,
+ `level` INT(10) NOT NULL,
  `name` VARCHAR(128) NOT NULL COLLATE 'utf8_unicode_ci',
  `created` DATETIME NULL,
  `modified` DATETIME NULL,

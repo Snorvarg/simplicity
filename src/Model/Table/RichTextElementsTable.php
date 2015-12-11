@@ -60,52 +60,62 @@ class RichTextElementsTable extends Table
 		return $languages;
 	}
 	
-	/* If language is set, only links of the given language is returned.
-	 * If category is set, only links starting with that is returned. Example: 'flowers' returns 'flowers/tulipans'.  
+	/* Get all elements in the given language, regardless of parent.
 	 * 
-	 * Returns a tree with the following format, ordered by the i18n language flag, then the identifier.
-	 *  array(
-	 *  	'en-GB' => array(
-	 *  		id => 'flowers/tulipan',
-	 *  		id => '..'
-	 *  	),
-	 *  	..
-	 *  )
-	 *  
-	 *  TODO: En funktion som trädar ner "flowers/tulipan" i flowers => tulipan
-	 *    för enkel meny-ifiering. 
-	 *  TODO: När innehållet blir stort, så bör man välja ut ett språk och en kategori i taget .
-	 *  TODO: En funktion som ger antalet kategorier i databasen. 
-	 *  TODO: En dokumentation med exempel som beskriver hur två arbetssätt: 
-	 *  	1. Man anger en url på det språk sidan är på, och får leva med att det blir svårt att se om motsvarande sida
-	 *       finns på de andra språken.
-	 *       (Men var tydlig med att menyerna funkar lika bra ändå)
-	 *    2. Man ser till att urlen (identifier) är densamma på samtliga språk, och får därmed fördelen att enkelt kunna
-	 *    	 se vilka fler språk sidan finns på.
 	 */
-	public function GetTree($i18n = null, $category = null)
+	public function ElementsForLanguage($i18n)
 	{
 		$conditions = array();
-		if($i18n != null)
-		{
-			$conditions['i18n'] = $i18n;
-		}
-		if($category != null)
-		{
-			$conditions['identifier like '] = $category.'/%';
-		}
+		$conditions['i18n'] = $i18n;
 		
+		// TODO: Query not updated, fix sometimes. :)
 		$query = $this->
-						find('list', ['valueField' => 'identifier', 'groupField' => 'i18n', 'conditions' => $conditions])->
-						order(['i18n','identifier']);
+						find('list', ['valueField' => 'name', 'groupField' => 'i18n', 'conditions' => $conditions])->
+						order(['i18n','name']);
 								
 		$all = $query->toArray();
 
-		// debug($all);
+		debug($all);
 		
 		return $all;
 	}
   
+	/* Returns the elements with the given parent category and language.
+	 * 
+	 */
+	public function ElementsForCategory($categoryId, $i18n = null, $compact = false)
+	{
+		if($compact)
+		{
+			$fields = ['name','id','category_id'];
+		}
+		else 
+		{
+			// null means fetch all fields. 
+			$fields = null;
+		}
+		
+		if($categoryId != null)
+		{
+			$where = ['category_id' => $categoryId];
+		}
+		else
+		{
+			$where = ['category_id is' => null];
+		}
+		
+		if($i18n != null)
+		{
+			$where['i18n'] = $i18n;
+		}
+		
+		$elements = $this->find('all', ['fields' => $fields])
+			->where($where)
+			->all();
+		
+		return $elements;
+	}
+	
 	/* The default way of identifying a rich text element is by it's url. 
 	 * Routing is setup to reroute "a/path/to/thisuniquepage?lang=sv-SE" 
 	 * into "editable_pages/display/a/path/to/thisuniquepage?lang=sv-SE". 

@@ -13,12 +13,18 @@ namespace App\Controller;
 use Cake\ORM\TableRegistry;
 
 /**
- * Static content controller
+ * Editable content controller
  *
  * This controller will render views from Template/EditablePages/ with content from EditablePages table.
+ * 
  */
 class EditablePagesController extends AppController
 {
+	public function initialize()
+	{
+		parent::initialize();
+		$this->loadComponent('Menu');
+	}
     /**
      * Using the path as an identifier, it loads the content from database and tries to render a view 
      * with the same name. If there is no view file (.ctp) with the given identifier, it renders the 
@@ -36,6 +42,10 @@ class EditablePagesController extends AppController
 				// Missing a path to use as identifier, just redirect home.
 				return $this->redirect('/');
 			}
+			
+			// TEST: Det funkar bra att få ut trädet så länge parent inte är null. Du måste fixa null med.
+			$tree = $this->Menu->GetTree(1, 3);
+// 			debug($tree);
 			
 			// The last element in path is always the page, all others are categories.
 			$categoryNames = $path;
@@ -92,7 +102,7 @@ class EditablePagesController extends AppController
  				return $this->redirect('/');
  			}
  			
- 			$this->set(compact('categoryNames', 'pageName', 'language', 'element'));
+ 			$this->set(compact('categoryNames', 'pageName', 'language', 'element', 'tree'));
 
 			// Tries to render specific .ctp file. If it does not exist, fall back to the default .ctp file.
 			// Using DS as we will check for a file's existence on the server.

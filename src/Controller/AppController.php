@@ -57,6 +57,7 @@ class AppController extends Controller
         	AppController::$selectedLanguage = AppController::$defaultLanguage;
         
         // TESTING
+        /*
         $richTextElements = TableRegistry::get('RichTextElements');
         
         $languages = $richTextElements->GetLanguageCodes();
@@ -65,7 +66,8 @@ class AppController extends Controller
         // debug($languagesForHome);
         
         $categories = TableRegistry::get('Categories');
-                                
+        $children = $categories->GetChildren(4);
+        */                   
         // TESTING END
     }
 
