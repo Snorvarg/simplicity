@@ -15,9 +15,6 @@ class MenuHelper extends Helper
 	 */
 	public function GetMenu($menuTree, $ulClass = 'simplicity', $liClass = 'simplicity')
 	{
-		// Finns det någon anledning att ha en flagga för no-pages, eller only-pages? (I component då)
-		
-// 		debug($menuTree);
 		$html = '';
 				
 		$html .= '<ul class="'.$ulClass.' root level_1">';
@@ -41,6 +38,8 @@ class MenuHelper extends Helper
 		
 		$repository = $element->source();
 		
+// TODO: css 'active_page' for the page currently active. 
+
 		if($repository == 'Categories')
 		{
 // TODO: Det kan ju finnas varianter på denna funktion: (och GetMenu() så klart) 

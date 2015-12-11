@@ -76,14 +76,14 @@ class EditablePagesController extends AppController
 	 				return $this->redirect('/');
 	 			}
 	 			
-	 			$categoryId = $lastCategory->id;
-	 			$level = $lastCategory->level + 1;
+	 			$categoryId = $lastCategory->parent_id;
+	 			$level = 3;
 			}
 			else 
 			{
 				// This page is a root page, it has no parent category.
 				$categoryId = null;
-				$level = 1;
+				$level = 2;
 			}
  			
 			// Load the content of the current page.
@@ -101,15 +101,15 @@ class EditablePagesController extends AppController
  			}
  			
  			// Get the menu tree with the root elements and their immediate children.
-//  			$tree = $this->Menu->GetTree($categoryId, $level);
- 			$tree = $this->Menu->GetTree(null, 20);
+  		$tree = $this->Menu->GetTree($categoryId, $level);
+//  			$tree = $this->Menu->GetTree(null, 20);
  			// 			debug($tree);
  			
  			$homeTree = $this->Menu->GetTree(null, 1);
  			
  			// TODO: Jag behöver en bread-crumb array med alla categories som länkar.  			
  			
- 			$this->set(compact('categoryNames', 'pageName', 'language', 'element', 'tree'));
+ 			$this->set(compact('categoryNames', 'pageName', 'language', 'element', 'tree', 'homeTree'));
 
 			// Tries to render specific .ctp file. If it does not exist, fall back to the default .ctp file.
 			// Using DS as we will check for a file's existence on the server.

@@ -3,9 +3,12 @@
 use App\Controller\EditablePagesController;
 
 //debug($element->identifier);
-
-	echo $this->Menu->GetMenu($tree);
 ?>
+
+<h3>Home menu</h3>
+<?= $this->Menu->GetMenu($homeTree); ?>
+<h3>Context menu</h3>
+<?= $this->Menu->GetMenu($tree); ?>
 
 <div>
 	<?= $element->content ?>
