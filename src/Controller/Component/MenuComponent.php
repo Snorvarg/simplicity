@@ -5,7 +5,6 @@ namespace App\Controller\Component;
 use App\Controller;
 use Cake\Controller\Component;
 use Cake\ORM\TableRegistry;
-use TestApp\Controller\Component\AppleComponent;
 use App\Controller\AppController;
 
 class MenuComponent extends Component

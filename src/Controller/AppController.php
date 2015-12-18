@@ -29,9 +29,9 @@ use Cake\ORM\TableRegistry;
  */
 class AppController extends Controller
 {
-		// Set default language to your like. 
-		public static $defaultLanguage = 'SV-se';
-		public static $selectedLanguage = null;
+		// Set default language to your like, but make sure it is present in table languages, i18n.  
+		public static $defaultLanguage = 'sv_SE';
+		public static $selectedLanguage = '';
 		
     /**
      * Initialization hook method.
@@ -57,17 +57,22 @@ class AppController extends Controller
         	AppController::$selectedLanguage = AppController::$defaultLanguage;
         
         // TESTING
-        /*
+        $languages = TableRegistry::get('Languages');
+        // $variants = $languages->GetVariants('en');
+        // debug($variants);
+        
         $richTextElements = TableRegistry::get('RichTextElements');
         
         $languages = $richTextElements->GetLanguageCodes();
         
-        $languagesForHome = $richTextElements->GetLanguagesFor('home');
-        // debug($languagesForHome);
+        $home = $richTextElements->GetElement('home',null,'sv_SE');
+        $languagesForHome = $richTextElements->GetLanguagesFor($home->name, $home->category_id);
+//         debug($home);
+//         debug($languagesForHome);
         
         $categories = TableRegistry::get('Categories');
-        $children = $categories->GetChildren(4);
-        */                   
+        // $children = $categories->GetChildren(4);
+                           
         // TESTING END
     }
 

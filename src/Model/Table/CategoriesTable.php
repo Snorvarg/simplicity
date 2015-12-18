@@ -40,8 +40,6 @@ class CategoriesTable extends Table
 	 * 
 	 * This can be used to fetch the immediate sub-menu-items for the currently active menu.
 	 * 
-	 * TODO: Dels trädstrukturen som de har 'färdig' för Tree, med länkar, 
-	 * dels en Helper (eller Component?) som producerar en meny för den nivån som är aktiv. 
 	 * 
 	 * 1. Denna Helper/Component ska ha en MainMenu() som helt enkelt tar alla rot-element. 
 	 * 2. Den ska också ha SubMenu($categoryId) som kort o gott anropar GetChildren() nedan. 
@@ -54,14 +52,6 @@ class CategoriesTable extends Table
 	 *      belse/bubbels/. Detta är vad som kallas en submeny. 
 	 *  EX: Huvudmenyn är fortfarande alla sidor och kategorier utan förälder.
 	 *  
-	 *  OBS: Den stora frågan kvarstår: Helper/Component? Det får nog bli både och, och så får jag läsa på lite om 
-	 *  		 AppController::preRender() eller vad det nu kan heta, där detta arbetet ska göras. (Kan i princip göras
-	 *  		 i EditablePagesController::display() med..)
-	 *  			<-Nä, användaren vill nog ha friheten att ha andra controllers ändå, som enkelt kan få menyn etc. via en
-	 *  			  Component. En Helper kan sedan ta resultatet från Componenten och rendera. 
-	 *  				Givetvis gör EditablePagesController::display() allt detta i ett ordnat kaos.
-	 *  			<-Alltså, display() anropar komponenten o får ett gäng meny-variabler. Vyn default.ctp använder sedan
-	 *  				Helpern för att rendera menyn. Då kan vilken controller som helst använda sig av meny-systemet. 
 	 */
 	public function GetTree($categoryId = null, $deep = 1)
 	{
@@ -291,7 +281,7 @@ class CategoriesTable extends Table
 	
 	//     Språktaggen i18n i RichTextElement medger att jag kan ha samtliga språkversioner av 
 	//     RödaRosor, RedRoses, RosasRojos, osv. med samma parent_id. 
-	//     Då blir det bajseligt lätt att se på vilka språk en sida finns: GetLanguagesFor($name)
+	//     Då blir det bajseligt lätt att se på vilka språk en sida finns: GetLanguagesFor($name, $parentId)
 	//		  OBS: Hela detta tänket förutsätter att det är ok att en url är flowers/roses/the_red_french_rose,
 	//      på alla språk. 
 	//       Det finns alltså tre språkversioner av RichTextElement med identifier "the_red_french_rose", och 

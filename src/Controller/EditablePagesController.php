@@ -20,11 +20,19 @@ use Cake\ORM\TableRegistry;
  */
 class EditablePagesController extends AppController
 {
+	public $categories;
+	public $richTextElements;
+	
 	public function initialize()
 	{
 		parent::initialize();
 		$this->loadComponent('Menu');
+		$this->loadComponent('Language');
+		
+		$this->categories = TableRegistry::get('Categories');
+		$this->richTextElements = TableRegistry::get('RichTextElements');
 	}
+	
     /**
      * Using the path as an identifier, it loads the content from database and tries to render a view 
      * with the same name. If there is no view file (.ctp) with the given identifier, it renders the 
@@ -52,9 +60,7 @@ class EditablePagesController extends AppController
 			//debug(AppController::$selectedLanguage);
 
 			$language = AppController::$selectedLanguage;
-			
-			$categories = TableRegistry::get('Categories');
-			
+						
 			$createIfNotExist = false;
 			if(EditablePagesController::UserCanEditPages())
 			{
@@ -65,7 +71,7 @@ class EditablePagesController extends AppController
 			if(count($categoryNames) > 0)
 			{
 				// Get the path, or null if it does not exist and is not allowed to create it. 
-	 			$lastCategory = $categories->GetPath($categoryNames, true, $createIfNotExist);
+	 			$lastCategory = $this->categories->GetPath($categoryNames, true, $createIfNotExist);
 	 			// debug($lastCategory);
 				
 	 			if($lastCategory == null)
@@ -88,9 +94,9 @@ class EditablePagesController extends AppController
 			}
  			
 			// Load the content of the current page.
-			$richTextElements = TableRegistry::get('RichTextElements');
+			$this->richTextElements = TableRegistry::get('RichTextElements');
 				
- 			$element = $richTextElements->GetElement(
+ 			$element = $this->richTextElements->GetElement(
  					$pageName, $categoryId, $language, $createIfNotExist);
  			// debug($element);
  			
@@ -132,32 +138,69 @@ class EditablePagesController extends AppController
 				$this->render('default');
 			}
 		}
-		
-		public function edit($id = null)
+	
+	public function edit($id = null)
+	{
+		if(EditablePagesController::UserCanEditPages() == false)
 		{
-			if(EditablePagesController::UserCanEditPages() == false)
-			{
-				$this->Flash->error(__('You are not allowed to edit content of this page.'));
-				return $this->redirect('/');
-			}
-			
-			$richTextElements = TableRegistry::get('RichTextElements');
-			
-			if($richTextElements->exists(['id' => $id]) == false)
-			{
-				$this->Flash->error(__('The page could not be found.'));
-				return $this->redirect('/');
-			}
+			$this->Flash->error(__('You are not allowed to edit content of this page.'));
+			return $this->redirect('/');
+		}
+				
+		if($this->richTextElements->exists(['id' => $id]) == false)
+		{
+			$this->Flash->error(__('The page could not be found.'));
+			return $this->redirect('/');
+		}
 
-			$element = $richTextElements->get($id);
+		$element = $this->richTextElements->get($id);
+		// debug($element);
+		
+		$availableLanguageCodes = $this->Language->GetLanguageCodes();
+		$implementedLanguageCodes = $this->Language->GetLanguagesFor($element->name, $element->category_id);
+		$missingLanguages = $this->Language->GetMissingLanguages($element->name, $element->category_id);
+		// debug($availableLanguageCodes);
+					
+		if ($this->request->is(['post', 'put'])) 
+		{
+			// debug($this->request->data);
+			// debug($element);
 			
-			if ($this->request->is(['post', 'put'])) 
+			if($this->request->data['i18n'] != $element->i18n && $this->request->data['i18n'] != '')
 			{
-				//debug($this->request->data);
-				//debug($element);
+				// Save as new page in the new language. 
+				$element = $this->richTextElements->GetElement(
+						$element->name, 
+						$element->category_id, 
+						$this->request->data['i18n'], 
+						true);
+
+				// Set the new content. 
+				$this->richTextElements->patchEntity($element, $this->request->data);
+				
+				if ($this->richTextElements->save($element))
+				{
+					$this->Flash->success(__('Your page has been created in the new language.'));
+					
+					// Get path for the page.
+					$path = $this->categories->PathFor($element->category_id);
+					$path .= $element->name;
+					// debug($path);
+						
+					return $this->redirect($path.'?lang='.$element->i18n);
+				}
+				else
+				{
+					$this->Flash->error(__('The page could not be saved.'));
+				}
+			}
+			else 
+			{
+				// When updating an existing page, the language cannot be changed. 
+				unset($this->request->data['i18n']);
 				
 				// Copy values into the element while also validating the fields.
-				$richTextElements->patchEntity($element, $this->request->data);
+				$this->richTextElements->patchEntity($element, $this->request->data);
 				
 				// Now a 'dirty' flag is set for the 'content', hinting it has been modified but not yet saved.
 				// The 'modified' flag is not yet updated as it happens right before saving. 
@@ -165,13 +208,12 @@ class EditablePagesController extends AppController
 				// debug($element);
 				
 				// Save the element with it's changes.
-				if ($richTextElements->save($element)) 
+				if ($this->richTextElements->save($element)) 
 				{
 					$this->Flash->success(__('Your page has been updated.'));
 					
 					// Get path for the page.
-					$categories = TableRegistry::get('Categories');
-					$path = $categories->PathFor($element->category_id);
+					$path = $this->categories->PathFor($element->category_id);
 					$path .= $element->name;
 					// debug($path);
 					
@@ -182,39 +224,38 @@ class EditablePagesController extends AppController
 					$this->Flash->error(__('The page could not be saved.'));
 				}
 			}
-			
-			$this->set('element', $element);
 		}
+		
+		$this->set(compact('element','availableLanguageCodes','implementedLanguageCodes','missingLanguages'));
+	}
 
-		public function delete($id = null)
+	public function delete($id = null)
+	{
+		if(EditablePagesController::UserCanEditPages() == false)
 		{
-			if(EditablePagesController::UserCanEditPages() == false)
-			{
-				$this->Flash->error(__('You do not have permission to delete this page.'));
-				return $this->redirect('/');
-			}
-			
-			// Make sure only post and delete are allowed. Trying to load this page normally will yield an exception.
-			// It is a safety-precaution as web crawlers could accidentally delete all content while exploring all links.
-			$this->request->allowMethod(['post', 'delete']);
-			
-			$richTextElements = TableRegistry::get('RichTextElements');
-				
-			$element = $richTextElements->get($id);
-						
-			if($richTextElements->delete($element))
-			{
-				$this->Flash->success(__('The page was deleted.'));
-				return $this->redirect('/');
-			}
-			
-			$this->Flash->error(__('The page could not be deleted.'));
+			$this->Flash->error(__('You do not have permission to delete this page.'));
 			return $this->redirect('/');
 		}
 		
-		public static function UserCanEditPages()
+		// Make sure only post and delete are allowed. Trying to load this page normally will yield an exception.
+		// It is a safety-precaution as web crawlers could accidentally delete all content while exploring all links.
+		$this->request->allowMethod(['post', 'delete']);
+					
+		$element = $this->richTextElements->get($id);
+					
+		if($this->richTextElements->delete($element))
 		{
-			// TODO: Add session logic here. 
-			return true;
+			$this->Flash->success(__('The page was deleted.'));
+			return $this->redirect('/');
 		}
+		
+		$this->Flash->error(__('The page could not be deleted.'));
+		return $this->redirect('/');
+	}
+		
+	public static function UserCanEditPages()
+	{
+		// TODO: Add session logic here. 
+		return true;
+	}
 }

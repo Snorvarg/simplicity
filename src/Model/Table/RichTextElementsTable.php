@@ -11,11 +11,14 @@ class RichTextElementsTable extends Table
 	}
 	
 	/* 
-	 * "thisuniquepage" + "en_GB" will load the english version of the page "thisuniquepage". 
-	 * "thisuniquepage" + "sv-SE" will load the swedish version.
+	 * "some_url_path" + "thisuniquepage" + "en_GB" will load the english version of the page "thisuniquepage". 
+	 * "some_url_path" + "thisuniquepage" + "sv_SE" will load the swedish version.
 	 * 
 	 * What if you want different url for the same page in Spanish? 
-	 * Simple: "paginaunico" + "es_ES" will be unique. 
+	 * Simple: "some_url_path" + "paginaunico" + "es_ES" will be unique. 
+	 * 
+	 * Of course, if you have the same page name but a different url, it will be another page:  
+	 * "another_url_path" + "thisuniquepage" + "en_GB"
 	 * 
 	 * NOTE: What is lost here is the connection between different language-versions of a page.. 
 	 *    ..I guess that is a trade-off between simplicity and total control. It is a no-fix at the moment at least, but in the future
@@ -23,20 +26,25 @@ class RichTextElementsTable extends Table
 	 * 
 	 */
 
-	/* Returns array of language codes used in total.
+	/* Returns all the languages present on the site.
+	 * Format: array keyed on language code, value: long name.
 	 * 
 	 */
 	public function GetLanguageCodes()
 	{
+		// The select() is necessary, otherwise the find() gets confused and leave long_name to null. 
+		// Solution: http://stackoverflow.com/questions/34326611/innerjoin-in-cakephp-3-returns-no-rows
 		$query = $this->
-						 find('list', ['keyField' => 'i18n', 'valueField' => 'i18n'])->
-						 group('i18n')->
-						 order(['i18n']);
-		
+						 find('list', ['keyField' => 'i18n', 'valueField' => 'Language.long_name'])->
+						 select(['i18n','Language.long_name'])->
+ 						 innerJoin(['Language' => 'languages'], ['Language.i18n = RichTextElements.i18n'])->
+						 group('RichTextElements.i18n')->
+						 order(['RichTextElements.i18n']);
+				
 		$all = $query->toArray();
-		
+		// debug($query);
 		// debug($all);
-		
+				
 		return $all;
 	}	
 	
@@ -49,15 +57,39 @@ class RichTextElementsTable extends Table
 	 * from GetLanguageCodes() and GetLanguagesFor(). 
 	 *  
 	 */
-	public function GetLanguagesFor($name)
+	public function GetLanguagesFor($name, $categoryId = null)
 	{
-		$languages = $this->find('list', ['keyField' => 'i18n', 'valueField' => 'i18n'])
-									->where(['name' => $name])
-									->toArray();
+		if($categoryId == null)
+		{
+			$where = ['name' => $name, 'category_id is' => null];
+		}
+		else 
+		{
+			$where = ['name' => $name, 'category_id' => $categoryId];
+		}
 		
+		$languages = $this->
+				find('list', ['keyField' => 'i18n', 'valueField' => 'Language.long_name'])->
+				select(['i18n','Language.long_name'])->
+				innerJoin(['Language' => 'languages'], ['Language.i18n = RichTextElements.i18n'])->
+				where($where)->
+				toArray();
+				
 		// debug($languages);
 		
 		return $languages;
+	}
+	
+	public function GetMissingLanguages($name, $categoryId = null)
+	{
+		$presentLanguages = $this->GetLanguagesFor($name, $categoryId);
+		$allLanguages = $this->GetLanguageCodes();
+		
+		// TODO: subtrahera från allLanguages, använd i edit().
+		$res = array_diff($allLanguages, $presentLanguages);
+		debug($res);
+		
+		return $res;
 	}
 	
 	/* Get all elements in the given language, regardless of parent.
@@ -123,11 +155,11 @@ class RichTextElementsTable extends Table
 	 * 
 	 * $categoryId in the same example would point to the "to" category.  
 	 * 
-	 * If $i18n is set, it should follow the i18n standards, like 'en-GB' for British english.
-	 * In the same example the url parameter 'lang' is extracted, which is 'sv-SE'
+	 * If $i18n is set, it should follow the i18n standards, like 'en_GB' for British english.
+	 * In the same example the url parameter 'lang' is extracted, which is 'sv_SE'
 	 * 
 	 * The three parts, categoryId + name + i18n forms a unique id.
-	 * In the same example it would be "to" + "thisuniquepage" + "sv-SE".
+	 * In the same example it would be "to" + "thisuniquepage" + "sv_SE".
 	 * It means that "thisuniquepage" can exist in several languages.
 	 * It also means that the name "thisuniquepage" can exist on different paths, 
 	 * like "some/other/path/to/thisuniquepage", or "/thisuniquepage".  
