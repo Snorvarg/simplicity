@@ -28,8 +28,15 @@ $cakeDescription = 'CakePHP: the rapid development php framework';
 
     <?= $this->Html->css('base.css') ?>
     <?= $this->Html->css('cake.css') ?>
+    <?= $this->Html->css('zurb-foundation-6/foundation.css') ?>    
+    <?= $this->Html->css('zurb-foundation-6/app.css') ?>
     <?= $this->Html->css('simplicity.css') ?>
 
+		<?= $this->Html->script('zurb-foundation-6/vendor/jquery.min.js') ?>
+		<?= $this->Html->script('zurb-foundation-6/vendor/what-input.min.js') ?>
+		<?= $this->Html->script('zurb-foundation-6/foundation.js') ?>
+		<?= $this->Html->script('zurb-foundation-6/app.js') ?>
+		
     <?= $this->fetch('meta') ?>
     <?= $this->fetch('css') ?>
     <?= $this->fetch('script') ?>
@@ -52,6 +59,30 @@ $cakeDescription = 'CakePHP: the rapid development php framework';
     <section class="container clearfix">
         <?= $this->fetch('content') ?>
     </section>
+    
+    <div class="row">
+    	<div class="large-12 columns">
+    		<h1>Hej svej!</h1>
+    	</div>
+    </div>
+    <div class="row">
+    	<div class="large-12 columns">
+    		<p>troll och bananer</p>
+    		<div class="row">
+    			<div class="large-4 medium-4 columns">
+    				<p>Korvören</p>
+    			</div>
+    			<div class="large-4 medium-4 columns">
+    				<p>Korvören</p>
+    			</div>
+    			<div class="large-4 medium-4 columns">
+    				<p>Korvören</p>
+    			</div>
+    		</div>
+    	</div>
+    </div>
+    <div style="margin-top: 50px;"></div>
+    
     <footer>
     </footer>
 </body>
