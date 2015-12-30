@@ -39,15 +39,15 @@ class MenuHelper extends Helper
 	/* Render the html for the given menu tree. 
 	 * 
 	 */
-	public function GetMenu($menuTree, $ulClass = 'simplicity', $liClass = 'simplicity')
+	public function GetMenu($menuTree, $ulClass = 'simplicity', $subUlClass = 'menu', $liClass = 'simplicity')
 	{
 		$html = '';
 				
-		$html .= '<ul class="'.$ulClass.' root level_1">';
+		$html .= '<ul class="'.$ulClass.' root level_1" data-dropdown-menu>';
 		$first = 'first';
 		foreach($menuTree as &$element)
 		{
-			$html .= $this->_GetMenu($element, $ulClass, $liClass, $first, 1);
+			$html .= $this->_GetMenu($element, $subUlClass, $liClass, $first, 1);
 			$first = '';
 		}
 		$html .= '</ul>';
@@ -76,14 +76,17 @@ class MenuHelper extends Helper
 
 			$html .= $this->Html->link($element->name.' - '.$element->level, $element->path.$element->name);
 			
-			$html .= '<ul class="'.$ulClass.' child level_'.($level + 1).'">';
-			$first = 'first';
-			foreach($element->children as &$child)
+			if(count($element->children) > 0)
 			{
-				$html .= $this->_GetMenu($child, $ulClass, $liClass, $first, $level + 1);
-				$first = '';
+				$html .= '<ul class="'.$ulClass.' child level_'.($level + 1).'">';
+				$first = 'first';
+				foreach($element->children as &$child)
+				{
+					$html .= $this->_GetMenu($child, $ulClass, $liClass, $first, $level + 1);
+					$first = '';
+				}
+				$html .= '</ul>';
 			}
-			$html .= '</ul>';
 		}
 		else // RichTextElements 
 		{

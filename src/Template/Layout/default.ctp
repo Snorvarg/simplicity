@@ -31,11 +31,6 @@ $cakeDescription = 'CakePHP: the rapid development php framework';
     <?= $this->Html->css('zurb-foundation-6/foundation.css') ?>    
     <?= $this->Html->css('zurb-foundation-6/app.css') ?>
     <?= $this->Html->css('simplicity.css') ?>
-
-		<?= $this->Html->script('zurb-foundation-6/vendor/jquery.min.js') ?>
-		<?= $this->Html->script('zurb-foundation-6/vendor/what-input.min.js') ?>
-		<?= $this->Html->script('zurb-foundation-6/foundation.js') ?>
-		<?= $this->Html->script('zurb-foundation-6/app.js') ?>
 		
     <?= $this->fetch('meta') ?>
     <?= $this->fetch('css') ?>
@@ -60,6 +55,24 @@ $cakeDescription = 'CakePHP: the rapid development php framework';
         <?= $this->fetch('content') ?>
     </section>
     
+<button class="button" type="button" data-toggle="example-dropdown">Toggle Dropdown</button>
+<div class="dropdown-pane" id="example-dropdown" data-dropdown data-auto-focus="true">
+  Example form in a dropdown.
+  <form>
+    <div class="row">
+      <div class="medium-6 columns">
+        <label>Name
+          <input type="text" placeholder="Kirk, James T.">
+        </label>
+      </div>
+      <div class="medium-6 columns">
+        <label>Rank
+          <input type="text" placeholder="Captain">
+        </label>
+      </div>
+    </div>
+  </form>
+</div>    
     <div class="row">
     	<div class="large-12 columns">
     		<h1>Hej svej!</h1>
@@ -67,16 +80,13 @@ $cakeDescription = 'CakePHP: the rapid development php framework';
     </div>
     <div class="row">
     	<div class="large-12 columns">
-    		<p>troll och bananer</p>
+    		<p>-</p>
     		<div class="row">
     			<div class="large-4 medium-4 columns">
-    				<p>Korvören</p>
+    				<p>Here goes menu</p>
     			</div>
-    			<div class="large-4 medium-4 columns">
-    				<p>Korvören</p>
-    			</div>
-    			<div class="large-4 medium-4 columns">
-    				<p>Korvören</p>
+    			<div class="large-8 medium-8 columns">
+    				<p>and some content.</p>
     			</div>
     		</div>
     	</div>
@@ -84,6 +94,13 @@ $cakeDescription = 'CakePHP: the rapid development php framework';
     <div style="margin-top: 50px;"></div>
     
     <footer>
+    	a fancy footer
     </footer>
+    
+    <?php // Zurb Foundation js really have to be at the bottom of the html file, otherwise it wont initialize correctly. ?>
+		<?= $this->Html->script('zurb-foundation-6/vendor/jquery.min.js') ?>
+		<?= $this->Html->script('zurb-foundation-6/vendor/what-input.min.js') ?>
+		<?= $this->Html->script('zurb-foundation-6/foundation.js') ?>
+		<?= $this->Html->script('zurb-foundation-6/app.js') ?>    
 </body>
 </html>

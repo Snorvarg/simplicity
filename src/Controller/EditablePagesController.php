@@ -119,7 +119,7 @@ class EditablePagesController extends AppController
   		//	$tree = $this->Menu->GetTree(null, 20);
  			// 			debug($tree);
  			
- 			$homeTree = $this->Menu->GetTree(null, 1); 			
+ 			$homeTree = $this->Menu->GetTree(null, 5); 			
  			
  			$this->set(compact('categoryNames', 'pageName', 'language', 'element', 'breadcrumbPath', 'tree', 'homeTree'));
 

@@ -6,9 +6,9 @@ use App\Controller\EditablePagesController;
 ?>
 
 <h3>Home menu</h3>
-<?= $this->Menu->GetMenu($homeTree); ?>
+<?= $this->Menu->GetMenu($homeTree, 'dropdown menu', 'menu'); ?>
 <h3>Context menu</h3>
-<?= $this->Menu->GetMenu($tree); ?>
+<?= $this->Menu->GetMenu($tree, 'dropdown menu', 'menu'); ?>
 
 <?= $this->Menu->GetBreadCrumb($breadcrumbPath, $element); ?>
 
