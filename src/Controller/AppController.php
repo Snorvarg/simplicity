@@ -56,6 +56,9 @@ class AppController extends Controller
         if(AppController::$selectedLanguage == null)
         	AppController::$selectedLanguage = AppController::$defaultLanguage;
         
+        // To make it available from views as well. TODO: Call function from view, as in cakephp2? 
+        $this->set('userIsAdmin', AppController::UserIsAdmin());
+        	
         // TESTING
         $languages = TableRegistry::get('Languages');
         // $variants = $languages->GetVariants('en');
@@ -110,5 +113,11 @@ class AppController extends Controller
     	}
     	
     	return parent::redirect($url, $status);
+    }
+    
+    public static function UserIsAdmin()
+    {
+    	// TODO: Add session logic here.
+    	return true;
     }
 }

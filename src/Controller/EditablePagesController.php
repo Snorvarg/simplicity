@@ -62,7 +62,7 @@ class EditablePagesController extends AppController
 			$language = AppController::$selectedLanguage;
 						
 			$createIfNotExist = false;
-			if(EditablePagesController::UserCanEditPages())
+			if(AppController::UserIsAdmin())
 			{
 				$createIfNotExist = true;
 			}
@@ -141,7 +141,7 @@ class EditablePagesController extends AppController
 	
 	public function edit($id = null)
 	{
-		if(EditablePagesController::UserCanEditPages() == false)
+		if(AppController::UserIsAdmin() == false)
 		{
 			$this->Flash->error(__('You are not allowed to edit content of this page.'));
 			return $this->redirect('/');
@@ -231,7 +231,7 @@ class EditablePagesController extends AppController
 
 	public function delete($id = null)
 	{
-		if(EditablePagesController::UserCanEditPages() == false)
+		if(AppController::UserIsAdmin() == false)
 		{
 			$this->Flash->error(__('You do not have permission to delete this page.'));
 			return $this->redirect('/');
@@ -251,11 +251,5 @@ class EditablePagesController extends AppController
 		
 		$this->Flash->error(__('The page could not be deleted.'));
 		return $this->redirect('/');
-	}
-		
-	public static function UserCanEditPages()
-	{
-		// TODO: Add session logic here. 
-		return true;
-	}
+	}		
 }

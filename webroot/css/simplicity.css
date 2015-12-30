@@ -22,3 +22,7 @@ li.simplicity{
 .columns{
 	border: 1px solid red;
 }
+
+.button.top-margin{
+	margin-top: 10px;
+}

@@ -26,7 +26,7 @@ use App\Controller\EditablePagesController;
 	// TODO: Nu ska RichTextElementsHelper komma till nytta, för den ska ha en funktion
 	// för att rendera en edit-knapp. Resten sköter ju vyn om, renderingen etc.
 
-	if(EditablePagesController::UserCanEditPages())
+	if($userIsAdmin)
 	{
 		echo $this->Html->link(
 				__('Edit page'), 

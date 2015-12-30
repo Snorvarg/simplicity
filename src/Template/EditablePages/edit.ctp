@@ -6,10 +6,26 @@
 echo $this->TinyMCE->GetScript();
 ?>
 
+<?php 
+	echo $this->Html->link(
+		__('Add new language'),
+		[
+				'controller' => 'SimplicitySettings',
+				'action' => 'edit',
+		],
+		[
+				'class' => 'button float-right top-margin',
+		]);
+?>
+
 <h1><?= __("Edit Page") ?></h1>
 
 <p>
-	<?= __('The page\'s current language is: ').'"'.$availableLanguageCodes[$element->i18n].'"'; ?>
+	<?php 
+		echo __('The page\'s current language is: ').'"'.$availableLanguageCodes[$element->i18n].'"'; 
+	?>
+	<br>
+	This page is available in the following languages: TODO: Ett gäng flaggor som länkar till resp. sidas edit sida. 
 </p>
 <?php
     echo $this->Form->create($element);
@@ -29,6 +45,6 @@ echo $this->TinyMCE->GetScript();
     		]);
     
     echo $this->Form->input('content');
-    echo $this->Form->button(__('Save Page'));
+    echo $this->Form->button(__('Save Page'), ['class' => 'button top-margin']);
     echo $this->Form->end();
 ?>

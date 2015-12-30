@@ -26,8 +26,9 @@ class LanguagesTable extends Table
 	/* ..or search, as it is what it does. It finds any rows where the i18n column starts with the given string.
 	 * Set onlyStart to false to make it match 'R' in 'en_RW'.
 	 * 
+	 * Set compact to true to get an array keyed on i18n with long_name as value.
 	 */
-	public function GetVariants($i18n, $onlyStart = true)
+	public function GetVariants($i18n, $onlyStart = true, $compact = false)
 	{
 		if($onlyStart)
 		{
@@ -37,16 +38,17 @@ class LanguagesTable extends Table
 		{
 			$conditions = ['i18n LIKE' => '%'.$i18n.'%'];
 		}
-		
- 		$rows = $this->find('all')->where($conditions)->all();
-
-//  		debug($rows);
-// 		$res = '';
-// 		foreach($rows as $row)
-// 		{
-// 			$res .= ', '.$row->i18n;
-// 		}
-// 		debug($res);
+				
+		if($compact)
+		{
+			$query = $this->find('list', ['keyField' => 'i18n', 'valueField' => 'long_name'])->where($conditions)->order(['i18n']);
+			$rows = $query->toArray();
+		}
+		else
+		{
+			$query = $this->find('all')->where($conditions);
+	 		$rows = $query->all();
+		}
 		
 		return $rows;
 	}

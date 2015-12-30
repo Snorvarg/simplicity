@@ -57,6 +57,11 @@ Router::scope('/', function ($routes) {
      * ..the /pages/delete is reserved for deleting pages.
      */
     $routes->connect('/pages/delete/*', ['controller' => 'EditablePages', 'action' => 'delete']);
+
+    /**
+     * ..the simplicity_settings/edit is reserved as well.
+     */
+    $routes->connect('/simplicity_settings/edit', ['controller' => 'SimplicitySettings', 'action' => 'edit']);
     
     /**
      * ..and connect all other pages to the 'EditablePages' controller. 
