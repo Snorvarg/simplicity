@@ -135,6 +135,7 @@ class EditablePagesController extends AppController
 			}
 			else 
 			{
+				$this->viewBuilder()->layout('simplicity');
 				$this->render('default');
 			}
 		}
@@ -166,7 +167,7 @@ class EditablePagesController extends AppController
 			// debug($this->request->data);
 			// debug($element);
 			
-			if($this->request->data['i18n'] != $element->i18n && $this->request->data['i18n'] != '')
+			if(isset($this->request->data['i18n']) && $this->request->data['i18n'] != $element->i18n && $this->request->data['i18n'] != '')
 			{
 				// Save as new page in the new language. 
 				$element = $this->richTextElements->GetElement(
@@ -226,6 +227,7 @@ class EditablePagesController extends AppController
 			}
 		}
 		
+		$this->viewBuilder()->layout('simplicity');
 		$this->set(compact('element','availableLanguageCodes','implementedLanguageCodes','missingLanguages'));
 	}
 

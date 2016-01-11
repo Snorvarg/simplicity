@@ -2,15 +2,23 @@
 
 use App\Controller\EditablePagesController;
 
+$this->start('simplicity_top_menu');
+	echo $this->Menu->GetMenu($homeTree, 'simplicity dropdown menu', 'simplicity menu');
+$this->end();
+$this->start('simplicity_side_menu');
+	echo '<h4>Context menu</h4>';
+	echo $this->Menu->GetAccordionMenu($tree); 
+$this->end();
+$this->start('simplicity_breadcrumbs');
+	echo $this->Menu->GetBreadCrumb($breadcrumbPath, $element);
+$this->end();
+$this->start('simplicity_page_name');
+	// A bit odd, but to use a utility, we must give full path. 
+	echo Cake\Utility\Inflector::camelize($element->name);
+$this->end();
+
 //debug($element->identifier);
 ?>
-
-<h3>Home menu</h3>
-<?= $this->Menu->GetMenu($homeTree, 'dropdown menu', 'menu'); ?>
-<h3>Context menu</h3>
-<?= $this->Menu->GetMenu($tree, 'dropdown menu', 'menu'); ?>
-
-<?= $this->Menu->GetBreadCrumb($breadcrumbPath, $element); ?>
 
 <div>
 	<?= $element->content ?>

@@ -1,0 +1,31 @@
+
+
+Saker att fixa i Simplicity: 
+
+1. Menyn verkar inte bry sig om språken, kanske inte så konstigt då Category inte har en språktagg!
+	<-MenuComponent.GetPath() kan utan vidare begära att sista elementet är ett rte, och därmed kontrollera att det existerar. 
+	<-Bryter man upp problemet: 
+		1. Path neråt mot roten finns alltid, eftersom vi är på en sida som finns på det givna språket. Därmed finns hela pathen neråt. 
+		2. Det är endast path 'uppåt', mot okända barn för sidans category, som ställer till problem. 
+		   Här kan en användare gnälla över att dessa dyker upp fast han inte översatt dem ännu. Rimligt gnäll. 
+			 Lösningen är ju tyvärr att först ta ut varje path uppåt, och sedan kontrollera att det finns ett rte-child nånstans i den riktningen. 
+			 <-Urkrångligt. 
+			   Så frågan är: 
+					Är funktionen som listar paths uppåt viktig? Den är av lite teoretisk nytta.. Något en admin kanske kan ha nytta av. 
+					
+Diskussionen ovan leder till hur menyn ska byggas av användaren. Det verkar ju bli per språk! Och väldigt manuell!
+	<-Och detta tar bort en stor del av 'simplicity', att det automatiskt ska vara där så fort det skapats en sida.
+	<-En idé är ju att ta alla sidors path, på ett språk, merga samman till ett träd och presentera det. Men då kan du ju kast categories igen. :)
+	  Använda sig av Tree's 'kategori' som låter en skapa flera träd i samma tabell? Sätta språktaggen där. 
+		Då kommer varje språk att ha sitt eget träd, och det är ju faktiskt det som eftersöks här. 
+		
+		Admin går in på ett språk och redigerar en sida, sparar den under ett nytt språk. Då skapas samma trädstruktur till roten direkt, endast då han explicit går in och skapar sidan. Mycket bra. 
+		
+Nu, allvarligt; Hur ska menyn byggas automatiskt? Med lösningen ovan funkar det ju att lista paths uppåt. 
+
+0. Hemmenyn. Finns redan. Ska snyggas till och läggas högst upp. Många sidor klarar sig med detta!
+1. En del av lösningen är att enkelt kunna länka till en existerande sida från wysiwyg. Ett plugin alltså, som listar sidorna i en trädstruktur. 
+2. Del två är trädet som visar parent node, 'grannar' på samma nivå, samt x children ner. Finns redan. 
+3. Sedan är det i princip endast speciellt framtagna listor. Avvaktar med det tills behov finnes. 
+
+		

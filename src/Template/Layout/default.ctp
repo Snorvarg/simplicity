@@ -43,6 +43,11 @@ $cakeDescription = 'CakePHP: the rapid development php framework';
                 <h1><a href=""><?= $this->fetch('title') ?></a></h1>
             </li>
         </ul>
+
+				<div class="top-bar-left">
+        	<?= $this->fetch('simplicity_top_menu') ?>
+				</div>
+				
         <section class="top-bar-section">
             <ul class="right">
                 <li><a target="_blank" href="http://book.cakephp.org/3.0/">Documentation</a></li>
@@ -96,6 +101,7 @@ $cakeDescription = 'CakePHP: the rapid development php framework';
     <footer>
     	a fancy footer
     </footer>
+    
     
     <?php // Zurb Foundation js really have to be at the bottom of the html file, otherwise it wont initialize correctly. ?>
 		<?= $this->Html->script('zurb-foundation-6/vendor/jquery.min.js') ?>

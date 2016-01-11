@@ -1,0 +1,3 @@
+Various references to pages which have helped me during the development of Simplicity CMS: 
+
+http://www.cssreset.com/demos/layouts/how-to-keep-footer-at-bottom-of-page-with-css/

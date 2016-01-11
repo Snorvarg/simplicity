@@ -18,7 +18,7 @@ class MenuComponent extends Component
 		$this->richTextElements = TableRegistry::get('RichTextElements');
 	}
 	
-	/* Returns the path for the given rte as an url-path, like 'trolls/eat/' for the page named 'snails'.
+	/* Set the $richTextElement->path for the given rte as an url-path, like 'trolls/eat/' for the page named 'snails'.
 	 * 
 	 */
 	public function SetPathFor(&$richTextElement)

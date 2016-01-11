@@ -23,7 +23,7 @@ class MenuHelper extends Helper
 		{
 			$element = &$path[$i];
 			
-			$html .= '<li class="'.$liClass.'">';
+			$html .= '<li class="">';
 			$html .= $this->Html->link($element->name, $element->path);
 			$html .= '</li>';
 		}
@@ -36,6 +36,25 @@ class MenuHelper extends Helper
 		return $html;
 	}
 	
+	/* Accordion - Fancy word for a top-down menu with collapsible sub-menus. 
+	 * 
+	 */
+	public function GetAccordionMenu($menuTree, $ulClass = 'simplicity accordion', $subUlClass = 'menu vertical nested', $liClass = 'simplicity')
+	{
+		$html = '';
+		
+		$html .= '<ul class="'.$ulClass.' vertical menu root level_1" aria-autoclose="false" data-accordion-menu>';
+		$first = 'first';
+		foreach($menuTree as &$element)
+		{
+			$html .= $this->_GetMenu($element, $subUlClass, $liClass, $first, 1);
+			$first = '';
+		}
+		$html .= '</ul>';
+		
+		return $html;
+	}
+	
 	/* Render the html for the given menu tree. 
 	 * 
 	 */
@@ -43,7 +62,7 @@ class MenuHelper extends Helper
 	{
 		$html = '';
 				
-		$html .= '<ul class="'.$ulClass.' root level_1" data-dropdown-menu>';
+		$html .= '<ul class="'.$ulClass.' root level_1" aria-autoclose="false" data-dropdown-menu>';
 		$first = 'first';
 		foreach($menuTree as &$element)
 		{

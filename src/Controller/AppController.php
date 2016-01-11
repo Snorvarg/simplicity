@@ -33,6 +33,8 @@ class AppController extends Controller
 		public static $defaultLanguage = 'sv_SE';
 		public static $selectedLanguage = '';
 		
+		public static $simplicity_site_title = 'Simplicity CMS';
+		
     /**
      * Initialization hook method.
      *
@@ -55,10 +57,10 @@ class AppController extends Controller
         // TODO: Try to get from browser cookie, and if no cookie, use the default language of the site. 
         if(AppController::$selectedLanguage == null)
         	AppController::$selectedLanguage = AppController::$defaultLanguage;
-        
+        	
         // To make it available from views as well. TODO: Call function from view, as in cakephp2? 
         $this->set('userIsAdmin', AppController::UserIsAdmin());
-        	
+        	        
         // TESTING
         $languages = TableRegistry::get('Languages');
         // $variants = $languages->GetVariants('en');

@@ -5,22 +5,55 @@
  */
  
 ul.simplicity.root{
-	color: red;
+	background-color: #2199E8;
 	font-weight: bold;
 }
-ul.simplicity{
-	color: black;
-	background-color: white;
+ul.simplicity.dropdown, .dropdown.menu .simplicity.menu{
+	background-color: #1189D8;
+	border: 0px;
+	border-top: 1px solid #2199E8;
+	margin-top: -1px; /* Visual fix in zurb dropdown menu css. */
 }
-li.simplicity.first{
-	color: brown;
+ul.simplicity.accordion li a::after{
+	border-color: white transparent transparent;
 }
-li.simplicity{
-	color: orange;
+ul.simplicity.breadcrumbs{
+	padding: 10px;
+	border-bottom: 1px solid #1189D8;
+}
+li.simplicity a{
+	color: #FAFAFA;
 }
 
+#simplicity-wrapper{
+	min-height: 100%;
+	position: relative;
+}
+#simplicity-content{
+	padding-bottom: 100px;
+}
+footer{
+	position: absolute; 
+	bottom: 0px;
+	
+	width: 100%;
+	background-color: #dddddd;
+	padding: 10px;
+}
+/*li.simplicity.level_2{
+	background-color: #1189D8;
+}
+li.simplicity.level_3{
+	background-color: #0179D8;
+}
+li.simplicity.level_4{
+	background-color: #0069C8;
+}
+li.simplicity.level_5{
+	background-color: #0059B8;
+}*/
+
 .columns{
-	border: 1px solid red;
 }
 
 .button.top-margin{
