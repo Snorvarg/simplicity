@@ -29,11 +29,14 @@ use Cake\ORM\TableRegistry;
  */
 class AppController extends Controller
 {
-		// Set default language to your like, but make sure it is present in table languages, i18n.  
-		public static $defaultLanguage = 'sv_SE';
-		public static $selectedLanguage = '';
+		// TODO:
+		//   <-Vid installationen så sätts alla default-värden efter att databas+tabeller skapats. 
+		//     Sedan är de enkla att komma åt från admin, och de läses in i Cache, läses från cache, som vanligt. 
 		
-		public static $simplicity_site_title = 'Simplicity CMS';
+		public static $selectedLanguage = '';
+		public static $simplicity_site_title = '';
+		public static $simplicity_site_description = '';
+		public static $simplicity_footer_text = '';
 		
     /**
      * Initialization hook method.
@@ -51,13 +54,28 @@ class AppController extends Controller
         $this->loadComponent('RequestHandler');
         $this->loadComponent('Flash');
 
+        $kitchenSink = TableRegistry::get('KitchenSink');
+        
         // Try get the chosen language as an url param, namely '?lang=SV-se'. 
         AppController::$selectedLanguage = $this->request->query('lang');
         
-        // TODO: Try to get from browser cookie, and if no cookie, use the default language of the site. 
+        // TODO: Try to get from browser cookie, and if no cookie, use the default language of the site.
+        
         if(AppController::$selectedLanguage == null)
-        	AppController::$selectedLanguage = AppController::$defaultLanguage;
-        	
+        {
+        	// No language found from url. Fetch default language.
+        	// Set default language to your like, but make sure it is present in table languages, i18n.
+        	// 
+        	AppController::$selectedLanguage = $kitchenSink->Retrieve('SimplicityDefaultLanguage', 'sv_SE');
+        }
+        
+        // Fetch some site-global settings from the kitchen sink.
+        AppController::$simplicity_site_title = $kitchenSink->Retrieve('SimplicitySiteTitle', 'Aurora Rizo Lopez');//Simplicity CMS');
+        AppController::$simplicity_site_description = $kitchenSink->Retrieve(
+        		'SimplicitySiteDescription', 'Master in Business administration');
+        AppController::$simplicity_footer_text = $kitchenSink->Retrieve(
+        		'SimplicityFooterText', 'Simplicity CMS - Simple. Simple. Simple. | Powered by CakePHP and Zurb Foundation | A Madskull Creations product');
+        
         // To make it available from views as well. TODO: Call function from view, as in cakephp2? 
         $this->set('userIsAdmin', AppController::UserIsAdmin());
         	        

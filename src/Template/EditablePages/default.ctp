@@ -3,7 +3,8 @@
 use App\Controller\EditablePagesController;
 
 $this->start('simplicity_top_menu');
-	echo $this->Menu->GetMenu($homeTree, 'simplicity dropdown menu', 'simplicity menu');
+	echo $this->Menu->GetMenu($homeTree, 'dropdown menu header-subnav', 'simplicity menu');
+	//echo $this->Menu->GetMenu($homeTree, 'simplicity dropdown menu', 'simplicity menu');
 $this->end();
 $this->start('simplicity_side_menu');
 	echo '<h4>Context menu</h4>';
