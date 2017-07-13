@@ -53,7 +53,7 @@ class CategoriesTable extends Table
 	 *  EX: Huvudmenyn är fortfarande alla sidor och kategorier utan förälder.
 	 *  
 	 */
-	public function GetTree($categoryId = null, $deep = 1)
+	public function GetTree($categoryId = null, $deep = 1, $language = 'sv_SE')
 	{
 		if($deep < 1)
 			throw new RuntimeException("Parameter deep cannot be less than one.");
@@ -88,6 +88,7 @@ class CategoriesTable extends Table
 			$tree = $this->find('children', ['for' => $categoryId])->
 				where([
 						'level <=' => $level + $deep,
+						'i18n' => $language
 				])->
 				// Get only the fields we want incorporates id and parent_id for 'threaded' to work. 
 		    find('threaded', ['fields' => ['name','parent_id','id','level']])->
@@ -100,6 +101,7 @@ class CategoriesTable extends Table
 				where([
 						'parent_id is' => null,
 						'level <=' => $deep,
+						'i18n' => $language
 				])->
 				find('all', ['fields' => ['name','parent_id','id','level']])->
 				toArray();
@@ -111,7 +113,7 @@ class CategoriesTable extends Table
 				
 				if($deep > 1)
 				{
-					$subTree = $this->GetTree($rootElement->id, $deep - 1);
+					$subTree = $this->GetTree($rootElement->id, $deep - 1, $language);
 					// debug($subTree);
 					
 					$rootElement->children = $subTree;
@@ -135,7 +137,7 @@ class CategoriesTable extends Table
 	 * 
 	 * If createIfNotExist is set to true, the path will be constructed if it does not yet exist.
 	 */
-	public function GetPath(Array $path, $lastChildOnly = true, $createIfNotExist = true)
+	public function GetPath(Array $path, $language, $lastChildOnly = true, $createIfNotExist = true)
 	{
 		if(count($path) == 0)
 			return null;
@@ -150,12 +152,12 @@ class CategoriesTable extends Table
 			if($lastCategory == null)
 			{
 				// Looking for a root category, no parent. 
-				$category = $this->find('all')->where(['name' => $name, 'parent_id is' => null])->first();
+				$category = $this->find('all')->where(['name' => $name, 'parent_id is' => null, 'i18n' => $language])->first();
 			}
 			else 
 			{
 				// Looking for a child category.
-				$category = $this->find('all')->where(['name' => $name, 'parent_id' => $lastCategory->id])->first();
+				$category = $this->find('all')->where(['name' => $name, 'parent_id' => $lastCategory->id, 'i18n' => $language])->first();
 			}
 			// debug($category);		
 			
@@ -166,11 +168,11 @@ class CategoriesTable extends Table
 					// Create the element.
 					if($lastCategory == null)
 					{
-						$category = $this->_CreateCategory(null, $name);
+						$category = $this->_CreateCategory(null, $name, $language);
 					}
 					else
 					{
-						$category = $this->_CreateCategory($lastCategory->id, $name);
+						$category = $this->_CreateCategory($lastCategory->id, $name, $language);
 					}
 					// debug($category);
 				}
@@ -225,19 +227,19 @@ class CategoriesTable extends Table
 	 * Returns null if not found.
 	 * 
 	 */
-	protected function _FindCategory($parent_id, $name)
+	protected function _FindCategory($parent_id, $name, $language)
 	{
 		if($parent_id == null)
 		{
 			// null is so damn special in sql... (almost like infinity and infinity + 1, they are not equal, but both are infinite. Well infinity never equals.)
 			$element = $this->find()
-			->where(['parent_id is ' => null, 'name' => $name])
+			->where(['parent_id is ' => null, 'name' => $name, 'i18n' => $language])
 			->first();
 		}
 		else
 		{
 			$element = $this->find()
-			->where(['parent_id' => $parent_id, 'name' => $name])
+			->where(['parent_id' => $parent_id, 'name' => $name, 'i18n' => $language])
 			->first();
 		}
 		
@@ -248,11 +250,12 @@ class CategoriesTable extends Table
 	 * Create a category with the given parent. It must not exist when calling this function.
 	 * 
 	 */
-	protected function _CreateCategory($parent_id, $name)
+	protected function _CreateCategory($parent_id, $name, $language)
 	{
 		$element = $this->newEntity();
 		$element->parent_id = $parent_id;
 		$element->name = $name;
+		$element->i18n = $language;
 		
 		if($this->save($element))
 		{
@@ -264,7 +267,7 @@ class CategoriesTable extends Table
 		}
 		 
 		// Once created, lets read it back in.
-		$element = $this->_FindCategory($parent_id, $name);
+		$element = $this->_FindCategory($parent_id, $name, $language);
 		
 		return $element;
 	}
@@ -294,12 +297,15 @@ class CategoriesTable extends Table
 }
 
 /*
+ ALTER TABLE `categories` ADD `i18n` VARCHAR(12) NOT NULL DEFAULT 'sv_SE' COLLATE 'utf8_unicode_ci' AFTER `level`;
+ 
  CREATE TABLE `categories` (
  `id` INT(10) NOT NULL AUTO_INCREMENT,
  `parent_id` INT(10) NULL,
  `lft` INT(10) NOT NULL,
  `rght` INT(10) NOT NULL,
  `level` INT(10) NOT NULL,
+ `i18n` VARCHAR(12) NOT NULL COLLATE 'utf8_unicode_ci',
  `name` VARCHAR(128) NOT NULL COLLATE 'utf8_unicode_ci',
  `created` DATETIME NULL,
  `modified` DATETIME NULL,

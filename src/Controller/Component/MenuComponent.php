@@ -29,9 +29,9 @@ class MenuComponent extends Component
 	/* Returns the given path as an array of category elements, or null if not the entire path exists.
 	 * 
 	 */
-	public function GetPath($categoryNames)
+	public function GetPath($categoryNames, $language)
 	{
-		$elements = $this->categories->GetPath($categoryNames, false, false);
+		$elements = $this->categories->GetPath($categoryNames, $language, false, false);
 		
 		if($elements == null)
 			return null;
@@ -76,9 +76,9 @@ class MenuComponent extends Component
 	 * 			dead
 	 * 	
 	 */
-	public function GetTree($parentCategoryId = null, $level = 0)
+	public function GetTree($parentCategoryId = null, $level = 0, $language = 'sv_SE')
 	{
-		$tree = $this->categories->GetTree($parentCategoryId, $level);
+		$tree = $this->categories->GetTree($parentCategoryId, $level, $language);
 
 		// The main difference between all() and toArray() is that all() uses 'lazy loading' while toArray() uses 'eager loading'.
 		// We need the result from all() realized into an array right now, so use toArray().

@@ -71,7 +71,7 @@ class EditablePagesController extends AppController
 			if(count($categoryNames) > 0)
 			{
 				// Get the path, or null if it does not exist and is not allowed to create it. 
-	 			$lastCategory = $this->categories->GetPath($categoryNames, true, $createIfNotExist);
+	 			$lastCategory = $this->categories->GetPath($categoryNames, $language, true, $createIfNotExist);
 	 			// debug($lastCategory);
 				
 	 			if($lastCategory == null)
@@ -111,15 +111,15 @@ class EditablePagesController extends AppController
  			$this->Menu->SetPathFor($element);
  			// debug($element->path);
  			
- 			$breadcrumbPath = $this->Menu->GetPath($categoryNames);
+ 			$breadcrumbPath = $this->Menu->GetPath($categoryNames, $language);
  			// debug($breadcrumbPath);
  			
  			// Get the menu tree with the root elements and their immediate children.
-  		$tree = $this->Menu->GetTree($parentCategoryId, $level);
-  		//	$tree = $this->Menu->GetTree(null, 20);
+  			$tree = $this->Menu->GetTree($parentCategoryId, $level, $language);
+	  		//	$tree = $this->Menu->GetTree(null, 20);
  			// 			debug($tree);
  			
- 			$homeTree = $this->Menu->GetTree(null, 5); 			
+ 			$homeTree = $this->Menu->GetTree(null, 5, $language); 			
  			
  			$this->set(compact('categoryNames', 'pageName', 'language', 'element', 'breadcrumbPath', 'tree', 'homeTree'));
 

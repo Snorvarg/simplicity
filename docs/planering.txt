@@ -1,8 +1,53 @@
 
+En diff-viewer i javascript: 
+  https://www.jsclasses.org/package/282-JavaScript-Find-and-view-the-difference-between-text-strings.html
+  <-Kan ju vara trevligt att länka in andra människors projekt. 
+  <-Versionshantering av sidor måste använda sidans id, eftersom dess titel etc. kan ändras.
+    Med hans versionshantering så får jag ladda in två versioner från databasen, och ge till hans javascript, så ska den visa skillnaderna.
+    Den klarar av ord-för-ord, rad-för-rad, och så tecken-för-tecken. Ord-för-ord är nog bäst i det här fallet.
+
+--------
+
+		// BTW; kolla in https://croogo.org/ de har förstått hur en sida för CMS ska se ut.
+		//  <-Men min ska börja med att ha en step-by-step guide, inget annat. 
+		//    1. Installera Simplicity - expanderar
+		//    2. Skapa en sida. - Expanderad från början! Detta är ändå det som är viktigast. 
+		//    3. Översätt. -expanderar
+		//    4. Inställningar
+		//    5. Några fler snygga exempel
+		//  <-Man ska på startsidan få allt vettigt presenterat för sig om Simplicity. 
+		//    Sedan ska det finnas länkar till djupare artiklar, annars känns det tunt. 
+		//    
+		// Jag vill ha två alternativ färdigt från början: 
+		//  1. Ett färdigt paket som wordpress där man får upp en installationssida där man ställer in databas, o sedan ett användarnamn o lösen. 
+		//  2. Ett superfärdigt erbjudande där man för 50 kr/år får en färdig sajt där man kan har x mb för bilder o delad databas. 
+		//     <-Detta är det stora jobbet, men genom att tex. ha en databas per köpare på manufrog, jag tror han har en gräns på fem db per konto,
+		//       så borde jag kunna vara up n running rätt snabbt. 
+		//       Sen är det mycket upp till honom hur jag ska kontrollera trafikmängder, max datalagring per konto, etc. 
+		// 
+
+-----språk----
+
+..Lägg in en default.png också för saknad flagg-ikon. ..Eller så tar den landets namn (Basque tex) o visar istället för ikonen.
+
+Ett alternativ är 
+https://github.com/lipis/flag-icon-css
+som har vektorgrafik i css! De skalar hur fint som helst. 
+
+-------------------
+
+Den här verkar verkligen kompetent; filstorage lokalt, dropbox, överallt. 
+https://github.com/burzum/cakephp-file-storage
+
+Och här är någon som har specat ordentligt hur man får igång det. 
+http://stackoverflow.com/questions/32031237/getting-started-with-cakephp-file-storage-quickstart-guide
+
+---------------
 
 Saker att fixa i Simplicity: 
 
-1. Menyn verkar inte bry sig om språken, kanske inte så konstigt då Category inte har en språktagg!
+1. FIXAT: Menyn verkar inte bry sig om språken, kanske inte så konstigt då Category inte har en språktagg!
+  <-Språktagg i18n på plats. 
 	<-MenuComponent.GetPath() kan utan vidare begära att sista elementet är ett rte, och därmed kontrollera att det existerar. 
 	<-Bryter man upp problemet: 
 		1. Path neråt mot roten finns alltid, eftersom vi är på en sida som finns på det givna språket. Därmed finns hela pathen neråt. 
@@ -18,14 +63,17 @@ Diskussionen ovan leder till hur menyn ska byggas av användaren. Det verkar ju 
 	<-En idé är ju att ta alla sidors path, på ett språk, merga samman till ett träd och presentera det. Men då kan du ju kast categories igen. :)
 	  Använda sig av Tree's 'kategori' som låter en skapa flera träd i samma tabell? Sätta språktaggen där. 
 		Då kommer varje språk att ha sitt eget träd, och det är ju faktiskt det som eftersöks här. 
-		
-		Admin går in på ett språk och redigerar en sida, sparar den under ett nytt språk. Då skapas samma trädstruktur till roten direkt, endast då han explicit går in och skapar sidan. Mycket bra. 
+    <-DONE 20170712: Jag har lagt till i18n i tabellen categories, och uppdaterat querysarna så de sorterar ut endast aktivt språk. 
+      Det verkar fungera, och det utan att blanda in Tree's kategori-koncept, som för övrigt ändå verkar vara samma sak.
+      <-Nu skapar den ett helt nytt träd för språket, precis som tänkt. 
+        Användaren kan alltså spara en sida på ett nytt språk, så skapas hela trädet i det språket också. 
+        Det betyder att man kan översätta delar av sidan och få med sig trädstrukturen efterhand utan problem.
 		
 Nu, allvarligt; Hur ska menyn byggas automatiskt? Med lösningen ovan funkar det ju att lista paths uppåt. 
 
-0. Hemmenyn. Finns redan. Ska snyggas till och läggas högst upp. Många sidor klarar sig med detta!
+0. DONE: Hemmenyn. Finns redan. Ska snyggas till och läggas högst upp. Många sidor klarar sig med detta!
 1. En del av lösningen är att enkelt kunna länka till en existerande sida från wysiwyg. Ett plugin alltså, som listar sidorna i en trädstruktur. 
-2. Del två är trädet som visar parent node, 'grannar' på samma nivå, samt x children ner. Finns redan. 
+2. DONE: Del två är trädet som visar parent node, 'grannar' på samma nivå, samt x children ner. Finns redan. 
 3. Sedan är det i princip endast speciellt framtagna listor. Avvaktar med det tills behov finnes. 
 
 		
