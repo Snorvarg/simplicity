@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # CakePHP Application Skeleton
 
 [![Build Status](https://api.travis-ci.org/cakephp/app.png)](https://travis-ci.org/cakephp/app)
@@ -45,4 +44,3 @@ Since Simplicity is based on the genially simple PagesController, you can add yo
 Just name it 'inventanamehere.ctp' and put it in the Template/EditablePages folder.
 
 I assume you are a bit into using Cake, so I leave you with this information, and urge you to contact me if you have any questions or ideas for improvements!
->>>>>>> 62bd225303ea004c2c8b333f64b3848f7875196e
